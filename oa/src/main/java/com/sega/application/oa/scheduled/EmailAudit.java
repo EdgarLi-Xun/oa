@@ -54,7 +54,7 @@ public class EmailAudit {
     idailyService.dsfs();
   }
 
-  @Scheduled(cron = "59 59 19 1/1 * ?")//每分钟查询一次
+  @Scheduled(cron = "59 59 20 1/1 * ?")//每分钟查询一次
   public void rbwfs() {
     idailyService.rbwfs();
   }
