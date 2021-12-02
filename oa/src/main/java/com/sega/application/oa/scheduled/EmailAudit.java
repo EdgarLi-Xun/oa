@@ -49,12 +49,12 @@ public class EmailAudit {
 //    taskTimeService.gsfsgstjWeek();
   }
 
-  @Scheduled(cron = "0 */1 * * * ?")//每分钟查询一次
+  @Scheduled(cron = "0 */1 17-23 * * ?")//每分钟查询一次
   public void dsfsrb() {
     idailyService.dsfs();
   }
 
-  @Scheduled(cron = "59 59 20 1/1 * ?")//每分钟查询一次
+  @Scheduled(cron = "59 59 20 1/1 * ?")//
   public void rbwfs() {
     idailyService.rbwfs();
   }
