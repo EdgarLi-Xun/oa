@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.humanEngineering.IAttendanceRecordDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.humanEngineering.AttendanceRecordEntity">
+		<id column="ar_id" property="arId" /><!-- 加班审核id -->
+		<result column="ar_id" property="arId" /><!-- 加班审核id -->
+		<result column="ar_username" property="arUsername" /><!-- 上班人名称 -->
+		<result column="ar_userid" property="arUserid" /><!-- 上班人id -->
+		<result column="ar_symbol" property="arSymbol" /><!-- 标记：0：无异常，1：异常 -->
+		<result column="ar_debuff" property="arDebuff" /><!-- 异常状态 -->
+		<result column="ar_checker_name" property="arCheckerName" /><!-- 审核人名称 -->
+		<result column="ar_checker_id" property="arCheckerId" /><!-- 审核人id -->
+		<result column="ar_overstate" property="arOverstate" /><!-- 加班状态：0：工作日加班，1：周末半天班，2：周末全天班，3：未加班 -->
+		<result column="ar_remark" property="arRemark" /><!-- 备注 -->
+		<result column="ar_date" property="arDate" /><!-- 日期 -->
+		<result column="ar_week" property="arWeek" /><!-- 星期 -->
+		<result column="ar_time" property="arTime" /><!-- 上班时长 -->
+		<result column="ar_lieupay_state" property="arLieupayState" /><!-- 工资调休日：0：无调休无工资，1：有调休无工资，2：无调休有工资 -->
+		<result column="ar_get_lieupay" property="arGetLieupay" /><!-- 获得工资调休日-->
+		<result column="ar_money" property="arMoney" /><!-- 金额：餐补和迟到 -->
+		<result column="ar_basicdata" property="arBasicdata" /><!-- 原始数据 -->
+		<result column="ar_create_by" property="arCreateBy" /><!-- 创建人 -->
+		<result column="ar_create_date" property="arCreateDate" /><!-- 创建时间 -->
+		<result column="ar_update_by" property="arUpdateBy" /><!-- 更新人 -->
+		<result column="ar_update_date" property="arUpdateDate" /><!-- 更新时间 -->
+		<result column="ar_del" property="arDel" /><!-- 是否删除：0：未删除，1：已删除 -->
+	</resultMap>
+	
+	<!--查询字段-->
+	<sql id="attendanceRecordColumns">
+		ar_id,
+		ar_username,
+		ar_userid,
+		ar_symbol,
+		ar_debuff,
+		ar_checker_name,
+		ar_checker_id,
+		ar_overstate,
+		ar_remark,
+		ar_date,
+		ar_week,
+		ar_time,
+		ar_lieupay_state,
+		ar_get_lieupay,
+		ar_money,
+		ar_basicdata,
+		ar_create_by,
+		ar_create_date,
+		ar_update_by,
+		ar_update_date,
+		ar_del
+	</sql>
+	
+	<!--查询条件-->
+	<sql id="commonCondition">
+        <if test="arId != null and arId != ''"> and ar_id=#{arId}</if>
+		<if test="arUsername != null and arUsername != ''"> and ar_username LIKE CONCAT(CONCAT('%', #{arUsername}), '%')</if>
+		<if test="arUserid != null"> and ar_userid=#{arUserid}</if>
+		<if test="arSymbol != null"> and ar_symbol=#{arSymbol}</if>
+		<if test="arDebuff != null and arDebuff != ''"> and ar_debuff LIKE CONCAT(CONCAT('%', #{arDebuff}), '%')</if>
+		<if test="arCheckerName != null and arCheckerName != ''"> and ar_checker_name LIKE CONCAT(CONCAT('%', #{arCheckerName}), '%')</if>
+		<if test="arCheckerId != null"> and ar_checker_id=#{arCheckerId}</if>
+		<if test="arOverstate != null"> and ar_overstate=#{arOverstate}</if>
+		<if test="arRemark != null and arRemark != ''"> and ar_remark LIKE CONCAT(CONCAT('%', #{arRemark}), '%')</if>
+		<if test="arDate != null"> and ar_date=#{arDate}</if>
+		<if test="arWeek != null and arWeek != ''"> and ar_week LIKE CONCAT(CONCAT('%', #{arWeek}), '%')</if>
+		<if test="arTime != null"> and ar_time=#{arTime}</if>
+		<if test="arLieupayState != null"> and ar_lieupay_state=#{arLieupayState}</if>
+		<if test="arMoney != null"> and ar_money=#{arMoney}</if>
+		<if test="arBasicdata != null and arBasicdata != ''"> and ar_basicdata LIKE CONCAT(CONCAT('%', #{arBasicdata}), '%')</if>
+		<if test="arCreateBy != null"> and ar_create_by=#{arCreateBy}</if>
+		<if test="arCreateDate != null"> and ar_create_date=#{arCreateDate}</if>
+		<if test="arUpdateBy != null"> and ar_update_by=#{arUpdateBy}</if>
+		<if test="arUpdateDate != null"> and ar_update_date=#{arUpdateDate}</if>
+		<if test="arDel != null"> and ar_del=#{arDel}</if>
+    </sql>
+
+	<!-- 条件查询 -->	
+	<select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.humanEngineering.AttendanceRecordEntity">
+		select <include refid="attendanceRecordColumns"></include> from attendance_record
+		<where>
+			<include refid="commonCondition"></include>
+			and ar_del=0
+		</where>
+		order by ar_id desc
+	</select>
+
+	<!-- 保存 -->
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="arId"
+		parameterType="com.sega.application.oa.entity.humanEngineering.AttendanceRecordEntity" >
+		insert into attendance_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="arUsername != null">ar_username,</if>
+			<if test="arUserid != null">ar_userid,</if>
+			<if test="arSymbol != null">ar_symbol,</if>
+			<if test="arDebuff != null">ar_debuff,</if>
+			<if test="arCheckerName != null">ar_checker_name,</if>
+			<if test="arCheckerId != null">ar_checker_id,</if>
+			<if test="arOverstate != null">ar_overstate,</if>
+			<if test="arRemark != null">ar_remark,</if>
+			<if test="arDate != null">ar_date,</if>
+			<if test="arWeek != null">ar_week,</if>
+			<if test="arTime != null">ar_time,</if>
+			<if test="arLieupayState != null">ar_lieupay_state,</if>
+			<if test="arMoney != null">ar_money,</if>
+			<if test="arBasicdata != null">ar_basicdata,</if>
+			<if test="arCreateBy != null">ar_create_by,</if>
+			<if test="arCreateDate != null">ar_create_date,</if>
+			<if test="arUpdateBy != null">ar_update_by,</if>
+			<if test="arUpdateDate != null">ar_update_date,</if>
+			<if test="arDel != null">ar_del,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="arUsername != null">#{arUsername},</if>
+			<if test="arUserid != null">#{arUserid},</if>
+			<if test="arSymbol != null">#{arSymbol},</if>
+			<if test="arDebuff != null">#{arDebuff},</if>
+			<if test="arCheckerName != null">#{arCheckerName},</if>
+			<if test="arCheckerId != null">#{arCheckerId},</if>
+			<if test="arOverstate != null">#{arOverstate},</if>
+			<if test="arRemark != null">#{arRemark},</if>
+			<if test="arDate != null">#{arDate},</if>
+			<if test="arWeek != null">#{arWeek},</if>
+			<if test="arTime != null">#{arTime},</if>
+			<if test="arLieupayState != null">#{arLieupayState},</if>
+			<if test="arMoney != null">#{arMoney},</if>
+			<if test="arBasicdata != null">#{arBasicdata},</if>
+			<if test="arCreateBy != null">#{arCreateBy},</if>
+			<if test="arCreateDate != null">#{arCreateDate},</if>
+			<if test="arUpdateBy != null">#{arUpdateBy},</if>
+			<if test="arUpdateDate != null">#{arUpdateDate},</if>
+			<if test="arDel != null">#{arDel},</if>
+		</trim>
+	</insert>
+
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="arId">
+		insert into attendance_record (ar_username,ar_userid,ar_symbol,ar_debuff,ar_checker_name,ar_checker_id,ar_overstate,ar_remark,ar_date,ar_week,ar_time,ar_lieupay_state,ar_money,ar_basicdata,ar_create_by,ar_create_date,ar_update_by,ar_update_date,ar_del,) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.arUsername},#{item.arUserid},#{item.arSymbol},#{item.arDebuff},#{item.arCheckerName},#{item.arCheckerId},#{item.arOverstate},#{item.arRemark},#{item.arDate},#{item.arWeek},#{item.arTime},#{item.arLieupayState},#{item.arMoney},#{item.arBasicdata},#{item.arCreateBy},#{item.arCreateDate},#{item.arUpdateBy},#{item.arUpdateDate},#{item.arDel},)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.humanEngineering.AttendanceRecordEntity">
+		update attendance_record
+		<set>
+			<if test="arUsername != null">ar_username=#{arUsername},</if>
+			<if test="arUserid != null">ar_userid=#{arUserid},</if>
+			<if test="arSymbol != null">ar_symbol=#{arSymbol},</if>
+			<if test="arDebuff != null">ar_debuff=#{arDebuff},</if>
+			<if test="arCheckerName != null">ar_checker_name=#{arCheckerName},</if>
+			<if test="arCheckerId != null">ar_checker_id=#{arCheckerId},</if>
+			<if test="arOverstate != null">ar_overstate=#{arOverstate},</if>
+			<if test="arRemark != null">ar_remark=#{arRemark},</if>
+			<if test="arDate != null">ar_date=#{arDate},</if>
+			<if test="arWeek != null">ar_week=#{arWeek},</if>
+			<if test="arTime != null">ar_time=#{arTime},</if>
+			<if test="arLieupayState != null">ar_lieupay_state=#{arLieupayState},</if>
+			<if test="arMoney != null">ar_money=#{arMoney},</if>
+			<if test="arBasicdata != null">ar_basicdata=#{arBasicdata},</if>
+			<if test="arCreateBy != null">ar_create_by=#{arCreateBy},</if>
+			<if test="arCreateDate != null">ar_create_date=#{arCreateDate},</if>
+			<if test="arUpdateBy != null">ar_update_by=#{arUpdateBy},</if>
+			<if test="arUpdateDate != null">ar_update_date=#{arUpdateDate},</if>
+			<if test="arDel != null">ar_del=#{arDel},</if>
+		</set>
+		<where>
+			<if test="arId != null"> and ar_id=#{arId}</if>
+			<if test="idArray != null">
+				ar_id in <foreach collection="idArray" item="item" index="index"
+										open="(" separator="," close=")">#{item}</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 根据id获取 -->
+	<select id="getById" resultMap="resultMap" parameterType="int">
+		select * from attendance_record where ar_id=#{arId} and ar_del=0
+	</select>
+
+	<!-- 根据实体获取 -->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.humanEngineering.AttendanceRecordEntity">
+		select * from attendance_record
+		<where>
+			<if test="arId != null"> and ar_id=#{arId}</if>
+			<if test="arUsername != null"> and ar_username=#{arUsername}</if>
+			<if test="arUserid != null"> and ar_userid=#{arUserid}</if>
+			<if test="arSymbol != null"> and ar_symbol=#{arSymbol}</if>
+			<if test="arDebuff != null"> and ar_debuff=#{arDebuff}</if>
+			<if test="arCheckerName != null"> and ar_checker_name=#{arCheckerName}</if>
+			<if test="arCheckerId != null"> and ar_checker_id=#{arCheckerId}</if>
+			<if test="arOverstate != null"> and ar_overstate=#{arOverstate}</if>
+			<if test="arRemark != null"> and ar_remark=#{arRemark}</if>
+			<if test="arDate != null"> and ar_date=#{arDate}</if>
+			<if test="arWeek != null"> and ar_week=#{arWeek}</if>
+			<if test="arTime != null"> and ar_time=#{arTime}</if>
+			<if test="arLieupayState != null"> and ar_lieupay_state=#{arLieupayState}</if>
+			<if test="arMoney != null"> and ar_money=#{arMoney}</if>
+			<if test="arBasicdata != null"> and ar_basicdata=#{arBasicdata}</if>
+			<if test="arCreateBy != null"> and ar_create_by=#{arCreateBy}</if>
+			<if test="arCreateDate != null"> and ar_create_date=#{arCreateDate}</if>
+			<if test="arUpdateBy != null"> and ar_update_by=#{arUpdateBy}</if>
+			<if test="arUpdateDate != null"> and ar_update_date=#{arUpdateDate}</if>
+			<if test="arDel != null"> and ar_del=#{arDel}</if>
+			and ar_del=0
+		</where>
+		limit 0,1
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteById" parameterType="int">
+		update attendance_record set ar_del=1 where ar_id=#{arId}
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" >
+		update attendance_record set ar_del=1
+		<where>
+			ar_id in <foreach collection="ids" item="item" index="index"
+									open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+
+	<!-- 根据实体删除 -->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.humanEngineering.AttendanceRecordEntity">
+		update attendance_record set ar_del=1
+		<where>
+			<if test="arId != null"> and ar_id=#{arId}</if>
+			<if test="arUsername != null"> and ar_username=#{arUsername}</if>
+			<if test="arUserid != null"> and ar_userid=#{arUserid}</if>
+			<if test="arSymbol != null"> and ar_symbol=#{arSymbol}</if>
+			<if test="arDebuff != null"> and ar_debuff=#{arDebuff}</if>
+			<if test="arCheckerName != null"> and ar_checker_name=#{arCheckerName}</if>
+			<if test="arCheckerId != null"> and ar_checker_id=#{arCheckerId}</if>
+			<if test="arOverstate != null"> and ar_overstate=#{arOverstate}</if>
+			<if test="arRemark != null"> and ar_remark=#{arRemark}</if>
+			<if test="arDate != null"> and ar_date=#{arDate}</if>
+			<if test="arWeek != null"> and ar_week=#{arWeek}</if>
+			<if test="arTime != null"> and ar_time=#{arTime}</if>
+			<if test="arLieupayState != null"> and ar_lieupay_state=#{arLieupayState}</if>
+			<if test="arMoney != null"> and ar_money=#{arMoney}</if>
+			<if test="arBasicdata != null"> and ar_basicdata=#{arBasicdata}</if>
+			<if test="arCreateBy != null"> and ar_create_by=#{arCreateBy}</if>
+			<if test="arCreateDate != null"> and ar_create_date=#{arCreateDate}</if>
+			<if test="arUpdateBy != null"> and ar_update_by=#{arUpdateBy}</if>
+			<if test="arUpdateDate != null"> and ar_update_date=#{arUpdateDate}</if>
+			<if test="arDel != null"> and ar_del=#{arDel}</if>
+		</where>
+	</select>
+
+	<!-- 查询全部 -->
+	<select id="queryAll" resultMap="resultMap">
+		select * from attendance_record where ar_del=0 order by ar_id
+	</select>
+
+
+	<!-- 导入数据测试 -->
+	<insert id="insert" useGeneratedKeys="true" keyProperty="arId"
+			parameterType="com.sega.application.oa.entity.humanEngineering.AttendanceRecordEntity" >
+		insert into attendance_record
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="arUsername != null">ar_username,</if>
+			<if test="arUserid != null">ar_userid,</if>
+			<if test="arSymbol != null">ar_symbol,</if>
+			<if test="arDebuff != null">ar_debuff,</if>
+			<if test="arCheckerName != null">ar_checker_name,</if>
+			<if test="arCheckerId != null">ar_checker_id,</if>
+			<if test="arOverstate != null">ar_overstate,</if>
+			<if test="arRemark != null">ar_remark,</if>
+			<if test="arDate != null">ar_date,</if>
+			<if test="arWeek != null">ar_week,</if>
+			<if test="arTime != null">ar_time,</if>
+			<if test="arLieupayState != null">ar_lieupay_state,</if>
+			<if test="arGetLieupay != null">ar_get_lieupay,</if>
+			<if test="arMoney != null">ar_money,</if>
+			<if test="arBasicdata != null">ar_basicdata,</if>
+			<if test="arCreateBy != null">ar_create_by,</if>
+			<if test="arCreateDate != null">ar_create_date,</if>
+			<if test="arUpdateBy != null">ar_update_by,</if>
+			<if test="arUpdateDate != null">ar_update_date,</if>
+			<if test="arDel != null">ar_del,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="arUsername != null">#{arUsername},</if>
+			<if test="arUserid != null">#{arUserid},</if>
+			<if test="arSymbol != null">#{arSymbol},</if>
+			<if test="arDebuff != null">#{arDebuff},</if>
+			<if test="arCheckerName != null">#{arCheckerName},</if>
+			<if test="arCheckerId != null">#{arCheckerId},</if>
+			<if test="arOverstate != null">#{arOverstate},</if>
+			<if test="arRemark != null">#{arRemark},</if>
+			<if test="arDate != null">#{arDate},</if>
+			<if test="arWeek != null">#{arWeek},</if>
+			<if test="arTime != null">#{arTime},</if>
+			<if test="arLieupayState != null">#{arLieupayState},</if>
+			<if test="arGetLieupay != null">#{arGetLieupay},</if>
+			<if test="arMoney != null">#{arMoney},</if>
+			<if test="arBasicdata != null">#{arBasicdata},</if>
+			<if test="arCreateBy != null">#{arCreateBy},</if>
+			<if test="arCreateDate != null">#{arCreateDate},</if>
+			<if test="arUpdateBy != null">#{arUpdateBy},</if>
+			<if test="arUpdateDate != null">#{arUpdateDate},</if>
+			<if test="arDel != null">#{arDel},</if>
+		</trim>
+	</insert>
+</mapper>

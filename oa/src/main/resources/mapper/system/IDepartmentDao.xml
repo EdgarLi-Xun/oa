@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.IDepartmentDao">
+
+  <resultMap id="resultMap" type="com.sega.application.oa.entity.system.DepartmentEntity">
+    <id column="department_id" property="departmentId"/><!--公司或部门编号主键自维护 -->
+    <result column="department_id" property="departmentId"/><!--公司或部门编号主键自维护 -->
+    <result column="department_code" property="departmentCode"/><!--公司部门编号 -->
+    <result column="department_name" property="departmentName"/><!--公司部门名称 -->
+    <result column="department_email" property="departmentEmail"/><!--公司邮箱 -->
+    <result column="department_postcode" property="departmentPostcode"/><!--邮编编码 -->
+    <result column="department_fax" property="departmentFax"/><!--公司传真 -->
+    <result column="department_telephone" property="departmentTelephone"/><!--公司电话 -->
+    <result column="department_type" property="departmentType"/><!--公司部门类型
+																		0：集团公司
+																		1：厂
+																		2：科室 -->
+    <result column="department_parent_id" property="departmentParentId"/><!--上级部门编号 -->
+    <result column="create_by" property="createBy"/><!--创建人 -->
+    <result column="create_date" property="createDate"/><!--创建时间 -->
+    <result column="update_by" property="updateBy"/><!--更新人 -->
+    <result column="update_date" property="updateDate"/><!--更新时间 -->
+    <result column="department_introduction" property="departmentIntroduction"/><!--公司介绍 -->
+    <result column="department_address" property="departmentAddress"/><!--公司地址 -->
+    <result column="department_del" property="departmentDel"/><!--是否已删除：0：未删除，1已删除 -->
+    <association property="parentDepartment" column="department_parent_id" select="getById"
+                 fetchType="lazy"></association>
+    <association property="company" column="department_company_id" select="getById" fetchType="lazy"></association>
+  </resultMap>
+
+  <!--保存-->
+  <insert id="saveEntity" useGeneratedKeys="true" keyProperty="departmentId"
+          parameterType="com.sega.application.oa.entity.system.DepartmentEntity">
+    insert into department
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="departmentCode != null">department_code,</if>
+      <if test="departmentName != null">department_name,</if>
+      <if test="departmentEmail != null">department_email,</if>
+      <if test="departmentPostcode != null">department_postcode,</if>
+      <if test="departmentFax != null">department_fax,</if>
+      <if test="departmentCompanyId != null">department_company_id,</if>
+      <if test="departmentTelephone != null">department_telephone,</if>
+      <if test="departmentType != null">department_type,</if>
+      <if test="departmentParentId != null">department_parent_id,</if>
+      <if test="createBy != null">create_by,</if>
+      <if test="createDate != null">create_date,</if>
+      <if test="updateBy != null">update_by,</if>
+      <if test="updateDate != null">update_date,</if>
+      <if test="departmentIntroduction != null">department_introduction,</if>
+      <if test="departmentAddress != null">department_address,</if>
+      <if test="departmentDel != null">department_del,</if>
+
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="departmentCode != null">#{departmentCode},</if>
+      <if test="departmentName != null">#{departmentName},</if>
+      <if test="departmentEmail != null">#{departmentEmail},</if>
+      <if test="departmentPostcode != null">#{departmentPostcode},</if>
+      <if test="departmentFax != null">#{departmentFax},</if>
+      <if test="departmentCompanyId != null">#{departmentCompanyId},</if>
+      <if test="departmentTelephone != null">#{departmentTelephone},</if>
+      <if test="departmentType != null">#{departmentType},</if>
+      <if test="departmentParentId != null">#{departmentParentId},</if>
+      <if test="createBy != null">#{createBy},</if>
+      <if test="createDate != null">#{createDate},</if>
+      <if test="updateBy != null">#{updateBy},</if>
+      <if test="updateDate != null">#{updateDate},</if>
+      <if test="departmentIntroduction != null">#{departmentIntroduction},</if>
+      <if test="departmentAddress != null">#{departmentAddress},</if>
+      <if test="departmentDel != null">#{departmentDel},</if>
+    </trim>
+  </insert>
+
+  <!--更新-->
+  <update id="updateEntity" parameterType="com.sega.application.oa.entity.system.DepartmentEntity">
+    update department
+    <set>
+      <if test="departmentCode != null">department_code=#{departmentCode},</if>
+      <if test="departmentName != null">department_name=#{departmentName},</if>
+      <if test="departmentEmail != null">department_email=#{departmentEmail},</if>
+      <if test="departmentPostcode != null">department_postcode=#{departmentPostcode},</if>
+      <if test="departmentCompanyId != null">department_company_id=#{departmentCompanyId},</if>
+      <if test="departmentFax != null">department_fax=#{departmentFax},</if>
+      <if test="departmentTelephone != null">department_telephone=#{departmentTelephone},</if>
+      <if test="departmentType != null">department_type=#{departmentType},</if>
+      <if test="departmentParentId != null">department_parent_id=#{departmentParentId},</if>
+      <if test="createBy != null">create_by=#{createBy},</if>
+      <if test="createDate != null">create_date=#{createDate},</if>
+      <if test="updateBy != null">update_by=#{updateBy},</if>
+      <if test="updateDate != null">update_date=#{updateDate},</if>
+      <if test="departmentIntroduction != null">department_introduction=#{departmentIntroduction},</if>
+      <if test="departmentAddress != null">department_address=#{departmentAddress},</if>
+      <if test="departmentDel != null">department_del=#{departmentDel},</if>
+    </set>
+    where department_id = #{departmentId} and department_del=0
+  </update>
+
+  <!--根据id获取-->
+  <select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+    select *
+    from department
+    where department_id = #{departmentId}
+      and department_del = 0
+  </select>
+
+  <!--根据ids获取-->
+  <select id="getByString" resultMap="resultMap" parameterType="String">
+    select *
+    from department
+    where department_id in (select user_department_id from "user" where user_id = #{ids})
+      and department_del = 0
+    order by department_code
+    limit 0,1
+  </select>
+
+  <!--根据实体获取-->
+  <select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.DepartmentEntity">
+    select * from department
+    <where>
+      <if test="departmentCode != null">and department_code=#{departmentCode}</if>
+      <if test="departmentName != null">and department_name=#{departmentName}</if>
+      <if test="departmentEmail != null">and department_email=#{departmentEmail}</if>
+      <if test="departmentPostcode != null">and department_postcode=#{departmentPostcode}</if>
+      <if test="departmentFax != null">and department_fax=#{departmentFax}</if>
+      <if test="departmentCompanyId != null">department_company_id=#{departmentCompanyId}</if>
+      <if test="departmentTelephone != null">and department_telephone=#{departmentTelephone}</if>
+      <if test="departmentType != null">and department_type=#{departmentType}</if>
+      <if test="departmentParentId != null">and department_parent_id=#{departmentParentId}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="departmentIntroduction != null">and department_introduction=#{departmentIntroduction}</if>
+      <if test="departmentAddress != null">and department_address=#{departmentAddress}</if>
+      <if test="departmentDel != null">and department_del=#{departmentDel}</if>
+      and department_del=0
+    </where>
+    order by department_code limit 0,1
+  </select>
+
+  <!--删除-->
+  <delete id="deleteById" parameterType="java.lang.Long">
+    update department
+    set department_del=1
+    where department_id = #{departmentId}
+  </delete>
+
+  <!--批量删除-->
+  <delete id="deleteByIds">
+    update department set department_del=1
+    <where>
+      department_id in
+      <foreach collection="ids" item="item" index="index"
+               open="(" separator="," close=")">#{item}
+      </foreach>
+    </where>
+  </delete>
+
+  <!--根据实体删除-->
+  <select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.DepartmentEntity">
+    update department set department_del=1
+    <where>
+
+      <if test="departmentId != null">and department_id=#{departmentId}</if>
+      <if test="departmentCode != null">and department_code=#{departmentCode}</if>
+      <if test="departmentName != null">and department_name=#{departmentName}</if>
+      <if test="departmentEmail != null">and department_email=#{departmentEmail}</if>
+      <if test="departmentCompanyId != null">department_company_id=#{departmentCompanyId}</if>
+      <if test="departmentPostcode != null">and department_postcode=#{departmentPostcode}</if>
+      <if test="departmentFax != null">and department_fax=#{departmentFax}</if>
+      <if test="departmentTelephone != null">and department_telephone=#{departmentTelephone}</if>
+      <if test="departmentType != null">and department_type=#{departmentType}</if>
+      <if test="departmentParentId != null">and department_parent_id=#{departmentParentId}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="departmentIntroduction != null">and department_introduction=#{departmentIntroduction}</if>
+      <if test="departmentAddress != null">and department_address=#{departmentAddress}</if>
+      <if test="departmentDel != null">and department_del=#{departmentDel}</if>
+    </where>
+  </select>
+
+  <!--查询全部-->
+  <select id="queryAll" resultMap="resultMap">
+    select *
+    from department
+    where department_del = 0
+    order by department_code
+  </select>
+
+  <!--条件查询-->
+  <select id="query" resultMap="resultMap">
+    select * from department d
+    <where>
+      <if test="departmentId != null">and d.department_id=#{departmentId}</if>
+      <if test="departmentCode != null">and d.department_code=#{departmentCode}</if>
+      <if test="departmentName != null and departmentName != ''">and d.department_name=#{departmentName}</if>
+      <if test="departmentEmail != null">and d.department_email=#{departmentEmail}</if>
+      <if test="departmentPostcode != null">and d.department_postcode=#{departmentPostcode}</if>
+      <if test="departmentFax != null">and d.department_fax=#{departmentFax}</if>
+      <if test="departmentCompanyId != null">and d.department_company_id=#{departmentCompanyId}</if>
+      <if test="departmentTelephone != null">and d.department_telephone=#{departmentTelephone}</if>
+      <if test="departmentType != null">and d.department_type=#{departmentType}</if>
+      <if test="departmentParentId != null">and d.department_parent_id=#{departmentParentId}</if>
+      <if test="createBy != null">and d.create_by=#{createBy}</if>
+      <if test="createDate != null">and d.create_date=#{createDate}</if>
+      <if test="updateBy != null">and d.update_by=#{updateBy}</if>
+      <if test="updateDate != null">and d.update_date=#{updateDate}</if>
+      <if test="departmentIntroduction != null">and d.department_introduction=#{departmentIntroduction}</if>
+      <if test="departmentAddress != null">and d.department_address=#{departmentAddress}</if>
+      <if test="departmentDel != null">and d.department_del=#{departmentDel}</if>
+      <if test="querySql != null">${querySql}</if>
+      <if test="ids != null">d.department_id in (${ids})</if>
+      and d.department_del=0
+    </where>
+    order by d.department_code
+  </select>
+
+  <!--条件查询-->
+  <select id="queryCompany" resultMap="resultMap">
+    SELECT * FROM department
+    <where>
+      <if test="departmentId != null">and department_id=#{departmentId}</if>
+      <if test="departmentCode != null">and department_code=#{departmentCode}</if>
+      <if test="departmentName != null and departmentName != ''">and department_name=#{departmentName}</if>
+      <if test="departmentEmail != null">and department_email=#{departmentEmail}</if>
+      <if test="departmentPostcode != null">and department_postcode=#{departmentPostcode}</if>
+      <if test="departmentFax != null">and department_fax=#{departmentFax}</if>
+      <if test="departmentTelephone != null">and department_telephone=#{departmentTelephone}</if>
+      <if test="departmentType != null">and department_type=#{departmentType}</if>
+      <if test="departmentParentId != null">and department_parent_id=#{departmentParentId}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="departmentIntroduction != null">and department_introduction=#{departmentIntroduction}</if>
+      <if test="departmentAddress != null">and department_address=#{departmentAddress}</if>
+      <if test="departmentDel != null">and department_del=#{departmentDel}</if>
+      and department_company_id IS NULL
+      and department_parent_id IS NOT NULL
+      and department_del=0
+    </where>
+    order by department_code
+  </select>
+  <select id="checkByDepartmentCode" resultType="java.lang.Integer">
+    select count(department_id)
+    from department
+    where department_code = #{departmentCode}
+    and department_del = 0
+    <if test="departmentId!=null and departmentId!=''">
+      and department_Id!=#{departmentId}
+    </if>
+  </select>
+  <select id="getEntityById" resultMap="resultMap">
+    select *
+    from department
+    where department_del = 0
+      and department_id = #{userDepartmentId}
+  </select>
+
+</mapper>

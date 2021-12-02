@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.daily.IDailyReceivcerDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.daily.DailyReceivcerEntity">
+		<id column="dr_id" property="drId" /><!-- 日报接收ID -->
+		<result column="dr_id" property="drId" /><!-- 日报接收ID -->
+		<result column="dr_daily_id" property="drDailyId" /><!-- 日报ID -->
+		<result column="dr_user_id" property="drUserId" /><!-- 日报接收人ID -->
+		<result column="dr_create_by" property="drCreateBy" /><!-- 创建人 -->
+		<result column="dr_create_date" property="drCreateDate" /><!-- 创建时间 -->
+		<result column="dr_update_by" property="drUpdateBy" /><!-- 更新人 -->
+		<result column="dr_update_date" property="drUpdateDate" /><!-- 更新时间 -->
+		<result column="dr_del" property="drDel" /><!-- 是否删除：0：未删除，1：已删除 -->
+	</resultMap>
+	
+	<!--查询字段-->
+	<sql id="dailyReceivcerColumns">
+		dr_id,
+		dr_daily_id,
+		dr_user_id,
+		dr_create_by,
+		dr_create_date,
+		dr_update_by,
+		dr_update_date,
+		dr_del
+	</sql>
+	
+	<!--查询条件-->
+	<sql id="commonCondition">
+        <if test="drId != null and drId != ''"> and dr_id=#{drId}</if>
+		<if test="drDailyId != null"> and dr_daily_id=#{drDailyId}</if>
+		<if test="drUserId != null"> and dr_user_id=#{drUserId}</if>
+		<if test="drCreateBy != null"> and dr_create_by=#{drCreateBy}</if>
+		<if test="drCreateDate != null"> and dr_create_date=#{drCreateDate}</if>
+		<if test="drUpdateBy != null"> and dr_update_by=#{drUpdateBy}</if>
+		<if test="drUpdateDate != null"> and dr_update_date=#{drUpdateDate}</if>
+		<if test="drDel != null"> and dr_del=#{drDel}</if>
+    </sql>
+
+	<!-- 条件查询 -->	
+	<select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyReceivcerEntity">
+		select <include refid="dailyReceivcerColumns"></include> from daily_receivcer
+		<where>
+			<include refid="commonCondition"></include>
+			and daily_receivcer_del=0
+		</where>
+		order by dr_id desc
+	</select>
+
+	<!-- 保存 -->
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="drId"
+		parameterType="com.sega.application.oa.entity.daily.DailyReceivcerEntity" >
+		insert into daily_receivcer
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="drDailyId != null">dr_daily_id,</if>
+			<if test="drUserId != null">dr_user_id,</if>
+			<if test="drCreateBy != null">dr_create_by,</if>
+			<if test="drCreateDate != null">dr_create_date,</if>
+			<if test="drUpdateBy != null">dr_update_by,</if>
+			<if test="drUpdateDate != null">dr_update_date,</if>
+			<if test="drDel != null">dr_del,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="drDailyId != null">#{drDailyId},</if>
+			<if test="drUserId != null">#{drUserId},</if>
+			<if test="drCreateBy != null">#{drCreateBy},</if>
+			<if test="drCreateDate != null">#{drCreateDate},</if>
+			<if test="drUpdateBy != null">#{drUpdateBy},</if>
+			<if test="drUpdateDate != null">#{drUpdateDate},</if>
+			<if test="drDel != null">#{drDel},</if>
+		</trim>
+	</insert>
+
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="drId">
+		insert into daily_receivcer (dr_daily_id,dr_user_id,dr_create_by,dr_create_date,dr_update_by,dr_update_date,dr_del,) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.drDailyId},#{item.drUserId},#{item.drCreateBy},#{item.drCreateDate},#{item.drUpdateBy},#{item.drUpdateDate},#{item.drDel},)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.daily.DailyReceivcerEntity">
+		update daily_receivcer
+		<set>
+			<if test="drDailyId != null">dr_daily_id=#{drDailyId},</if>
+			<if test="drUserId != null">dr_user_id=#{drUserId},</if>
+			<if test="drCreateBy != null">dr_create_by=#{drCreateBy},</if>
+			<if test="drCreateDate != null">dr_create_date=#{drCreateDate},</if>
+			<if test="drUpdateBy != null">dr_update_by=#{drUpdateBy},</if>
+			<if test="drUpdateDate != null">dr_update_date=#{drUpdateDate},</if>
+			<if test="drDel != null">dr_del=#{drDel},</if>
+		</set>
+		<where>
+			<if test="drId != null"> and dr_id=#{drId}</if>
+			<if test="idArray != null">
+				dr_id in <foreach collection="idArray" item="item" index="index"
+										open="(" separator="," close=")">#{item}</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 根据id获取 -->
+	<select id="getById" resultMap="resultMap" parameterType="int">
+		select * from daily_receivcer where dr_id=#{drId} and daily_receivcer_del=0
+	</select>
+
+	<!-- 根据实体获取 -->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyReceivcerEntity">
+		select * from daily_receivcer
+		<where>
+			<if test="drId != null"> and dr_id=#{drId}</if>
+			<if test="drDailyId != null"> and dr_daily_id=#{drDailyId}</if>
+			<if test="drUserId != null"> and dr_user_id=#{drUserId}</if>
+			<if test="drCreateBy != null"> and dr_create_by=#{drCreateBy}</if>
+			<if test="drCreateDate != null"> and dr_create_date=#{drCreateDate}</if>
+			<if test="drUpdateBy != null"> and dr_update_by=#{drUpdateBy}</if>
+			<if test="drUpdateDate != null"> and dr_update_date=#{drUpdateDate}</if>
+			<if test="drDel != null"> and dr_del=#{drDel}</if>
+			and daily_receivcer_del=0
+		</where>
+		limit 0,1
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteById" parameterType="int">
+		update daily_receivcer set daily_receivcer_del=1 where dr_id=#{drId}
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" >
+		update daily_receivcer set daily_receivcer_del=1
+		<where>
+			dr_id in <foreach collection="ids" item="item" index="index"
+									open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+
+	<!-- 根据实体删除 -->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.daily.DailyReceivcerEntity">
+		update daily_receivcer set daily_receivcer_del=1
+		<where>
+			<if test="drId != null"> and dr_id=#{drId}</if>
+			<if test="drDailyId != null"> and dr_daily_id=#{drDailyId}</if>
+			<if test="drUserId != null"> and dr_user_id=#{drUserId}</if>
+			<if test="drCreateBy != null"> and dr_create_by=#{drCreateBy}</if>
+			<if test="drCreateDate != null"> and dr_create_date=#{drCreateDate}</if>
+			<if test="drUpdateBy != null"> and dr_update_by=#{drUpdateBy}</if>
+			<if test="drUpdateDate != null"> and dr_update_date=#{drUpdateDate}</if>
+			<if test="drDel != null"> and dr_del=#{drDel}</if>
+		</where>
+	</select>
+
+	<!-- 查询全部 -->
+	<select id="queryAll" resultMap="resultMap">
+		select * from daily_receivcer where daily_receivcer_del=0 order by dr_id desc
+	</select>
+
+</mapper>

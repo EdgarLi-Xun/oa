@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.IFileDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.system.FileEntity">
+		<id column="file_id" property="fileId" /><!-- 文件ID -->
+		<result column="file_id" property="fileId" /><!-- 文件ID -->
+		<result column="file_name" property="fileName" /><!-- 文件名称（自动生成） -->
+		<result column="file_real_name" property="fileRealName" /><!-- 系统自动生成的流水号文件名称 -->
+		<result column="file_type" property="fileType" /><!-- 文件类型 -->
+		<result column="file_path" property="filePath" /><!-- 文件路径 -->
+		<result column="file_create_by" property="fileCreateBy" /><!-- 创建人 -->
+		<result column="file_create_date" property="fileCreateDate" /><!-- 创建时间 -->
+		<result column="file_update_by" property="fileUpdateBy" /><!-- 更新人 -->
+		<result column="file_update_date" property="fileUpdateDate" /><!-- 更新时间 -->
+		<result column="file_del" property="fileDel" /><!-- 是否删除：0：未删除，1：已删除 -->
+	</resultMap>
+	
+	<!--查询字段-->
+	<sql id="fileColumns">
+		file_id,
+		file_name,
+		file_real_name,
+		file_type,
+		file_path,
+		file_create_by,
+		file_create_date,
+		file_update_by,
+		file_update_date,
+		file_del
+	</sql>
+	
+	<!--查询条件-->
+	<sql id="commonCondition">
+        <if test="fileId != null and fileId != ''"> and file_id=#{fileId}</if>
+		<if test="fileName != null and fileName != ''"> and file_name LIKE CONCAT(CONCAT('%', #{fileName}), '%')</if>
+		<if test="fileRealName != null and fileRealName != ''"> and file_real_name LIKE CONCAT(CONCAT('%', #{fileRealName}), '%')</if>
+		<if test="fileType != null and fileType != ''"> and file_type LIKE CONCAT(CONCAT('%', #{fileType}), '%')</if>
+		<if test="filePath != null and filePath != ''"> and file_path LIKE CONCAT(CONCAT('%', #{filePath}), '%')</if>
+		<if test="fileCreateBy != null"> and file_create_by=#{fileCreateBy}</if>
+		<if test="fileCreateDate != null"> and file_create_date=#{fileCreateDate}</if>
+		<if test="fileUpdateBy != null"> and file_update_by=#{fileUpdateBy}</if>
+		<if test="fileUpdateDate != null"> and file_update_date=#{fileUpdateDate}</if>
+		<if test="fileDel != null"> and file_del=#{fileDel}</if>
+    </sql>
+
+	<!-- 条件查询 -->	
+	<select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.FileEntity">
+		select <include refid="fileColumns"></include> from file
+		<where>
+			<include refid="commonCondition"></include>
+			and file_del=0
+		</where>
+		order by file_id desc
+	</select>
+
+	<!-- 保存 -->
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="fileId"
+		parameterType="com.sega.application.oa.entity.system.FileEntity" >
+		insert into file
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="fileName != null">file_name,</if>
+			<if test="fileRealName != null">file_real_name,</if>
+			<if test="fileType != null">file_type,</if>
+			<if test="filePath != null">file_path,</if>
+			<if test="fileCreateBy != null">file_create_by,</if>
+			<if test="fileCreateDate != null">file_create_date,</if>
+			<if test="fileUpdateBy != null">file_update_by,</if>
+			<if test="fileUpdateDate != null">file_update_date,</if>
+			<if test="fileDel != null">file_del,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="fileName != null">#{fileName},</if>
+			<if test="fileRealName != null">#{fileRealName},</if>
+			<if test="fileType != null">#{fileType},</if>
+			<if test="filePath != null">#{filePath},</if>
+			<if test="fileCreateBy != null">#{fileCreateBy},</if>
+			<if test="fileCreateDate != null">#{fileCreateDate},</if>
+			<if test="fileUpdateBy != null">#{fileUpdateBy},</if>
+			<if test="fileUpdateDate != null">#{fileUpdateDate},</if>
+			<if test="fileDel != null">#{fileDel},</if>
+		</trim>
+	</insert>
+
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="fileId">
+		insert into file (file_name,file_real_name,file_type,file_path,file_create_by,file_create_date,file_update_by,file_update_date,file_del,) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.fileName},#{item.fileRealName},#{item.fileType},#{item.filePath},#{item.fileCreateBy},#{item.fileCreateDate},#{item.fileUpdateBy},#{item.fileUpdateDate},#{item.fileDel},)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.system.FileEntity">
+		update file
+		<set>
+			<if test="fileName != null">file_name=#{fileName},</if>
+			<if test="fileRealName != null">file_real_name=#{fileRealName},</if>
+			<if test="fileType != null">file_type=#{fileType},</if>
+			<if test="filePath != null">file_path=#{filePath},</if>
+			<if test="fileCreateBy != null">file_create_by=#{fileCreateBy},</if>
+			<if test="fileCreateDate != null">file_create_date=#{fileCreateDate},</if>
+			<if test="fileUpdateBy != null">file_update_by=#{fileUpdateBy},</if>
+			<if test="fileUpdateDate != null">file_update_date=#{fileUpdateDate},</if>
+			<if test="fileDel != null">file_del=#{fileDel},</if>
+		</set>
+		<where>
+			<if test="fileId != null"> and file_id=#{fileId}</if>
+			<if test="idArray != null">
+				file_id in <foreach collection="idArray" item="item" index="index"
+										open="(" separator="," close=")">#{item}</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 根据id获取 -->
+	<select id="getById" resultMap="resultMap" parameterType="int">
+		select * from file where file_id=#{fileId} and file_del=0
+	</select>
+
+	<!-- 根据实体获取 -->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.FileEntity">
+		select * from file
+		<where>
+			<if test="fileId != null"> and file_id=#{fileId}</if>
+			<if test="fileName != null"> and file_name=#{fileName}</if>
+			<if test="fileRealName != null"> and file_real_name=#{fileRealName}</if>
+			<if test="fileType != null"> and file_type=#{fileType}</if>
+			<if test="filePath != null"> and file_path=#{filePath}</if>
+			<if test="fileCreateBy != null"> and file_create_by=#{fileCreateBy}</if>
+			<if test="fileCreateDate != null"> and file_create_date=#{fileCreateDate}</if>
+			<if test="fileUpdateBy != null"> and file_update_by=#{fileUpdateBy}</if>
+			<if test="fileUpdateDate != null"> and file_update_date=#{fileUpdateDate}</if>
+			<if test="fileDel != null"> and file_del=#{fileDel}</if>
+			and file_del=0
+		</where>
+		limit 0,1
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteById" parameterType="int">
+		update file set file_del=1 where file_id=#{fileId}
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" >
+		update file set file_del=1
+		<where>
+			file_id in <foreach collection="ids" item="item" index="index"
+									open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+
+	<!-- 根据实体删除 -->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.FileEntity">
+		update file set file_del=1
+		<where>
+			<if test="fileId != null"> and file_id=#{fileId}</if>
+			<if test="fileName != null"> and file_name=#{fileName}</if>
+			<if test="fileRealName != null"> and file_real_name=#{fileRealName}</if>
+			<if test="fileType != null"> and file_type=#{fileType}</if>
+			<if test="filePath != null"> and file_path=#{filePath}</if>
+			<if test="fileCreateBy != null"> and file_create_by=#{fileCreateBy}</if>
+			<if test="fileCreateDate != null"> and file_create_date=#{fileCreateDate}</if>
+			<if test="fileUpdateBy != null"> and file_update_by=#{fileUpdateBy}</if>
+			<if test="fileUpdateDate != null"> and file_update_date=#{fileUpdateDate}</if>
+			<if test="fileDel != null"> and file_del=#{fileDel}</if>
+		</where>
+	</select>
+
+	<!-- 查询全部 -->
+	<select id="queryAll" resultMap="resultMap">
+		select * from file where file_del=0 order by file_id desc
+	</select>
+
+</mapper>

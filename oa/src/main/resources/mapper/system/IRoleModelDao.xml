@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.IRoleModelDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.system.RoleModelEntity">
+		<id column="rm_role_id" property="rmRoleId" /><!--角色编号 -->
+		<id column="rm_model_id" property="rmModelId" /><!--模块编号 -->
+		<association property="role" javaType="com.sega.application.oa.entity.system.RoleEntity">
+			<result column="role_name" property="roleName" />
+			<result column="role_describe" property="roleDescribe" />
+		</association>
+		<association property="model" javaType="com.sega.application.oa.entity.system.ModelEntity">
+			<result column="model_name" property="modelName" />
+			<result column="model_code" property="modelCode" />
+			<result column="model_describe" property="modelDescribe" />
+		</association>
+	</resultMap>
+	
+	<!--保存-->	
+	<insert id="saveEntity"	useGeneratedKeys="true" keyProperty="rmRoleId"
+		parameterType="com.sega.application.oa.entity.system.RoleModelEntity" >
+		insert into role_model
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="rmRoleId != null">rm_role_id,</if>
+			<if test="rmModelId != null">rm_model_id,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="rmRoleId != null">#{rmRoleId},</if>
+			<if test="rmModelId != null">#{rmModelId},</if>
+		</trim>
+	</insert>
+	
+	<!--更新-->	
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.system.RoleModelEntity">
+		update role_model
+		<set>
+			<if test="rmModelId != null">rm_model_id=#{rmModelId},</if>
+		</set>
+		where rm_role_id = #{rmRoleId}
+	</update>
+	
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List">
+		insert  into role_model (rm_role_id, rm_model_id) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.rmRoleId},#{item.rmModelId})
+		</foreach>
+	</insert>
+	
+	<!--根据id获取-->	
+	<select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+		select * from role_model where rm_role_id=#{rmRoleId}
+	</select>
+	
+	<!--根据实体获取-->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.RoleModelEntity">
+		select   * from role_model
+		<where>
+			<if test="rmRoleId != null">and rm_role_id=#{rmRoleId}</if>
+			<if test="rmModelId != null"> and rm_model_id=#{rmModelId}</if>
+		</where>
+		order by rm_id limit 0,1
+	</select>	
+	
+	<!--删除-->	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from role_model where rm_role_id=#{rmRoleId}
+	</delete>
+	
+	<!--批量删除-->	
+	<delete id="deleteByIds" >
+		delete from role_model
+		<where>
+			 rm_role_id in <foreach collection="ids" item="item" index="index" 
+			open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+	
+	<!--根据实体删除-->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.RoleModelEntity">
+		delete from role_model
+		<where>
+			<if test="rmRoleId != null">and rm_role_id=#{rmRoleId}</if>
+			<if test="rmModelId != null"> and rm_model_id=#{rmModelId}</if>
+		</where>
+	</select>
+	
+	<!--查询全部-->	
+	<select id="queryAll" resultMap="resultMap">
+		select * from role_model order by rm_role_id desc
+	</select>
+	
+	<!--条件查询-->	
+	<select id="query" resultMap="resultMap">
+		select * from role_model 
+			right join role on rm_role_id = role_id and role_del=0
+			right join model on rm_model_id = model_id and model_del=0
+		<where>
+			<if test="rmRoleId != null">and rm_role_id=#{rmRoleId}</if>
+			<if test="rmModelId != null">and rm_model_id=#{rmModelId}</if>
+			<if test="model != null">
+				<if test="model.modelCode != null and model.modelCode != ''"> and model_code=#{model.modelCode}</if>
+			</if>
+		</where>
+		order by rm_role_id desc
+	</select>
+	
+</mapper>

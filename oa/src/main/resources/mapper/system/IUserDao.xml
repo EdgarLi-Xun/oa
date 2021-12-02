@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.IUserDao">
+
+  <resultMap id="resultMap" type="com.sega.application.oa.entity.system.UserEntity">
+    <id column="user_id" property="userId"/><!-- 员工Id -->
+    <result column="user_id" property="userId"/><!-- 员工Id -->
+    <result column="user_name" property="userName"/><!--  -->
+    <result column="user_password" property="userPassword"/><!-- 密码 -->
+    <result column="user_department_id" property="userDepartmentId"/><!-- 所属部门 -->
+    <result column="user_role_id" property="userRoleId"/><!-- 用户角色Id -->
+    <result column="user_state" property="userState"/><!-- 0:在职
+1：离职 -->
+    <result column="user_email" property="userEmail"/><!-- 用户邮箱 -->
+    <result column="email_password" property="emailPassword"/><!-- 用户邮箱 -->
+    <result column="user_telephone" property="userTelephone"/><!--  -->
+    <result column="user_login_name" property="userLoginName"/><!-- 登录名 -->
+    <result column="user_gender" property="userGender"/><!-- 0:男，1:女 -->
+    <result column="user_age" property="userAge"/><!-- 年龄 -->
+    <result column="user_id_card" property="userIdCard"/><!-- 省份证 -->
+    <result column="user_address" property="userAddress"/><!-- 地址 -->
+    <result column="user_create_by" property="userCreateBy"/><!--  -->
+    <result column="user_create_date" property="userCreateDate"/><!--  -->
+    <result column="user_update_by" property="userUpdateBy"/><!--  -->
+    <result column="user_update_date" property="userUpdateDate"/><!--  -->
+    <result column="user_del" property="userDel"/><!-- 是否删除：0:未删除，1：已删除 -->
+    <result column="daily" property="daily"/><!-- 无需发日报：0:需要，1：不需要 -->
+    <result column="user_task_time" property="userTaskTime"/><!-- 1管理、2开发、3测试、4实施 -->
+    <association property="role" column="user_role_id" select="com.sega.application.oa.dao.system.IRoleDao.getById"
+                 fetchType="lazy"></association>
+  </resultMap>
+
+  <!--保存-->
+  <!-- 保存 -->
+  <insert id="saveEntity" useGeneratedKeys="true" keyProperty="userId"
+          parameterType="com.sega.application.oa.entity.system.UserEntity">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="userName != null">user_name,</if>
+      <if test="userPassword != null">user_password,</if>
+      <if test="userDepartmentId != null">user_department_id,</if>
+      <if test="userRoleId != null">user_role_id,</if>
+      <if test="userState != null">user_state,</if>
+      <if test="userEmail != null">user_email,</if>
+      <if test="emailPassword != null">email_password,</if>
+      <if test="userTelephone != null">user_telephone,</if>
+      <if test="userLoginName != null">user_login_name,</if>
+      <if test="userGender != null">user_gender,</if>
+      <if test="userAge != null">user_age,</if>
+      <if test="userIdCard != null">user_id_card,</if>
+      <if test="userAddress != null">user_address,</if>
+      <if test="userCreateBy != null">user_create_by,</if>
+      <if test="userCreateDate != null">user_create_date,</if>
+      <if test="userUpdateBy != null">user_update_by,</if>
+      <if test="userUpdateDate != null">user_update_date,</if>
+      <if test="userDel != null">user_del,</if>
+      <if test="daily != null">daily,</if>
+      <if test="userTaskTime != null">user_task_time,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="userName != null">#{userName},</if>
+      <if test="userPassword != null">#{userPassword},</if>
+      <if test="userDepartmentId != null">#{userDepartmentId},</if>
+      <if test="userRoleId != null">#{userRoleId},</if>
+      <if test="userState != null">#{userState},</if>
+      <if test="userEmail != null">#{userEmail},</if>
+      <if test="emailPassword != null">email_password,</if>
+      <if test="userTelephone != null">#{userTelephone},</if>
+      <if test="userLoginName != null">#{userLoginName},</if>
+      <if test="userGender != null">#{userGender},</if>
+      <if test="userAge != null">#{userAge},</if>
+      <if test="userIdCard != null">#{userIdCard},</if>
+      <if test="userAddress != null">#{userAddress},</if>
+      <if test="userCreateBy != null">#{userCreateBy},</if>
+      <if test="userCreateDate != null">#{userCreateDate},</if>
+      <if test="userUpdateBy != null">#{userUpdateBy},</if>
+      <if test="userUpdateDate != null">#{userUpdateDate},</if>
+      <if test="userDel != null">#{userDel},</if>
+      <if test="daily != null">#{daily},</if>
+      <if test="userTaskTime != null">#{userTaskTime},</if>
+    </trim>
+  </insert>
+
+  <!--更新-->
+  <!-- 更新 -->
+  <update id="updateEntity" parameterType="com.sega.application.oa.entity.system.UserEntity">
+    update user
+    <set>
+      <if test="userName != null">user_name=#{userName},</if>
+      <if test="userPassword != null">user_password=#{userPassword},</if>
+      <if test="userDepartmentId != null">user_department_id=#{userDepartmentId},</if>
+      <if test="userRoleId != null">user_role_id=#{userRoleId},</if>
+      <if test="userState != null">user_state=#{userState},</if>
+      <if test="userEmail != null">user_email=#{userEmail},</if>
+      <if test="emailPassword != null">email_password=#{emailPassword},</if>
+      <if test="userTelephone != null">user_telephone=#{userTelephone},</if>
+      <if test="userLoginName != null">user_login_name=#{userLoginName},</if>
+      <if test="userGender != null">user_gender=#{userGender},</if>
+      <if test="userAge != null">user_age=#{userAge},</if>
+      <if test="userIdCard != null">user_id_card=#{userIdCard},</if>
+      <if test="userAddress != null">user_address=#{userAddress},</if>
+      <if test="userCreateBy != null">user_create_by=#{userCreateBy},</if>
+      <if test="userCreateDate != null">user_create_date=#{userCreateDate},</if>
+      <if test="userUpdateBy != null">user_update_by=#{userUpdateBy},</if>
+      <if test="userUpdateDate != null">user_update_date=#{userUpdateDate},</if>
+      <if test="userDel != null">user_del=#{userDel},</if>
+      <if test="daily != null">daily=#{daily},</if>
+      <if test="userTaskTime != null">user_task_time=#{userTaskTime},</if>
+    </set>
+    <where>
+      <if test="userId != null">and user_id=#{userId}</if>
+      <if test="idArray != null">
+        user_id in
+        <foreach collection="idArray" item="item" index="index"
+                 open="(" separator="," close=")">#{item}
+        </foreach>
+      </if>
+    </where>
+  </update>
+
+  <!--根据id获取-->
+  <select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+    select *
+    from user
+    where user_id = #{userId}
+      and user_del = 0
+  </select>
+
+  <!--根据账号获取-->
+  <select id="getByAccount" resultMap="resultMap" parameterType="String">
+    select *
+    from user
+           left join role on role_id = user_role_id
+    where (
+          user_login_name = #{account}
+        or user_telephone = #{account}
+        or user_id_card = #{account}
+      )
+      and user_del = 0
+    order by user_id
+    limit 0,1
+  </select>
+
+  <!--根据实体获取-->
+  <select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.UserEntity">
+    select user.* from user left join department on user_department_id=department_id
+    <where>
+      <if test="userId != null">and user_id=#{userId}</if>
+      <if test="userLoginName != null">and user_login_name=#{userLoginName}</if>
+      <if test="userPassword != null">and user_password=#{userPassword}</if>
+      <if test="userName != null">and user_name=#{userName}</if>
+      <if test="userRoleId != null">and user_role_id=#{userRoleId}</if>
+      <if test="userState != null">and user_state=#{userState}</if>
+      <if test="userGender != null">and user_gender=#{userGender}</if>
+      <if test="userAge != null">and user_age=#{userAge}</if>
+      <if test="userIdCard != null">and user_id_card=#{userIdCard}</if>
+      <if test="userDepartmentId != null">and user_department_id=#{userDepartmentId}</if>
+      <if test="userTelephone != null">and user_telephone=#{userTelephone}</if>
+      <if test="userEmail != null">and user_email=#{userEmail}</if>
+      <if test="emailPassword != null">and email_password=#{emailPassword}</if>
+      <if test="userAddress != null">and user_address=#{userAddress}</if>
+      <if test="userCreateBy != null">and user_create_by=#{userCreateBy}</if>
+      <if test="userCreateDate != null">and user_create_date=#{userCreateDate}</if>
+      <if test="userUpdateBy != null">and user_update_by=#{userUpdateBy}</if>
+      <if test="userUpdateDate != null">and user_update_date=#{userUpdateDate}</if>
+      <if test="userDel != null">and user_del=#{userDel}</if>
+      and user_del=0
+    </where>
+    order by user_id limit 0,1
+  </select>
+
+  <!--删除-->
+  <delete id="deleteById" parameterType="java.lang.Long">
+    update user
+    set user_del=1
+    where user_id = #{userId}
+  </delete>
+
+  <!--批量删除-->
+  <delete id="deleteByIds">
+    update user set user_del=1
+    <where>
+      user_id in
+      <foreach collection="ids" item="item" index="index"
+               open="(" separator="," close=")">#{item}
+      </foreach>
+    </where>
+  </delete>
+
+  <!--根据实体删除-->
+  <select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.UserEntity">
+    update user set user_del=1
+    <where>
+      <if test="userLoginName != null">and user_login_name=#{userLoginName}</if>
+      <if test="userPassword != null">and user_password=#{userPassword}</if>
+      <if test="userName != null">and user_name=#{userName}</if>
+      <if test="userRoleId != null">and user_role_id=#{userRoleId}</if>
+      <if test="userGender != null">and user_gender=#{userGender}</if>
+      <if test="userAge != null">and user_age=#{userAge}</if>
+      <if test="userIdCard != null">and user_id_card=#{userIdCard}</if>
+      <if test="userDepartmentId != null">and user_department_id=#{userDepartmentId}</if>
+      <if test="userTelephone != null">and user_telephone=#{userTelephone}</if>
+      <if test="userEmail != null">and user_email=#{userEmail}</if>
+      <if test="emailPassword != null">and email_password=#{emailPassword}</if>
+      <if test="userAddress != null">and user_address=#{userAddress}</if>
+      <if test="userCreateBy != null">and user_create_by=#{userCreateBy}</if>
+      <if test="userCreateDate != null">and user_create_date=#{userCreateDate}</if>
+      <if test="userUpdateBy != null">and user_update_by=#{userUpdateBy}</if>
+      <if test="userUpdateDate != null">and user_update_date=#{userUpdateDate}</if>
+      <if test="userDel != null">and user_del=#{userDel}</if>
+    </where>
+  </select>
+
+  <!--查询全部-->
+  <select id="queryAll" resultMap="resultMap">
+    select *
+    from user
+    where user_del = 0
+    order by user_id
+  </select>
+
+  <!--条件查询-->
+  <select id="query" resultMap="resultMap">
+    SELECT userb
+    .* ,dept.department_name departmentName,rl.role_name roleName
+    FROM
+    `USER` userb
+    left join department dept on userb.user_department_id=dept.department_id
+    left join role rl on userb.user_role_id=rl.role_id
+    <where>
+      <if test="role != null">
+        <if test="role.roleName != null and role.roleName != ''">and role_name=#{role.roleName}</if>
+      </if>
+      <if test="department != null">
+        <if test="department.departmentId != null and department.departmentId != ''">and
+          (department_id=#{department.departmentId} or department_parent_id=#{department.departmentId})
+        </if>
+      </if>
+      <if test="userLoginName != null">and user_login_name like CONCAT('%', #{userLoginName}, '%')</if>
+      <if test="userPassword != null">and user_password=#{userPassword}</if>
+      <if test="userName != null and userName != ''">and user_name like CONCAT('%', #{userName}, '%')</if>
+      <if test="userRoleId != null">and user_role_id=#{userRoleId}</if>
+      <if test="userState != null">and user_state=#{userState}</if>
+      <if test="userGender != null and userGender &gt; -1">and user_gender=#{userGender}</if>
+      <if test="userAge != null">and user_age=#{userAge}</if>
+      <if test="userIdCard != null">and user_id_card=#{userIdCard}</if>
+      <if test="userDepartmentId != null">and user_department_id=#{userDepartmentId}</if>
+      <if test="userTelephone != null">and user_telephone=#{userTelephone}</if>
+      <if test="userEmail != null">and user_email=#{userEmail}</if>
+      <if test="emailPassword != null">and email_password=#{emailPassword}</if>
+      <if test="userAddress != null">and user_address=#{userAddress}</if>
+      <if test="userCreateBy != null">and user_create_by=#{userCreateBy}</if>
+      <if test="userCreateDate != null">and user_create_date=#{userCreateDate}</if>
+      <if test="userUpdateBy != null">and user_update_by=#{userUpdateBy}</if>
+      <if test="userUpdateDate != null">and user_update_date=#{userUpdateDate}</if>
+      <if test="userDel != null">and user_del=#{userDel}</if>
+      and user_del=0
+    </where>
+    order by user_id
+  </select>
+
+  <!--条件查询-->
+  <select id="queryByRoleIds" resultMap="resultMap">
+    select *
+    from user
+    where user_role_id in (${ids})
+      and user_del = 0
+    order by user_id
+  </select>
+
+  <select id="queryByUsernameAndPassword" resultMap="resultMap">
+    select *
+    from user
+    where user_name = #{userName}
+      and user_password = #{originPassword}
+  </select>
+  <select id="checkByLoginName" resultType="java.lang.Integer">
+    select count(user_id)
+    from user
+    where user_login_name = #{userLoginName}
+    and user_del = 0
+    <if test="userId!=null and userId!=''">
+      and user_id!=#{userId}
+    </if>
+  </select>
+  <select id="getByUserId" resultMap="resultMap">
+    select *
+    from user
+    where user_del = 0
+      and user_id = #{userId}
+  </select>
+  <select id="queryAllUser" resultMap="resultMap">
+    select *
+    from user
+    where user_del = 0
+      and daily != 1
+      and user_state = 0;
+  </select>
+  <select id="querySendUsers" resultMap="resultMap">
+    select *
+    from user
+    where user_del = 0
+      and daily != 1
+      and user_send_dx = 1
+      and user_state = 0;
+  </select>
+
+</mapper>

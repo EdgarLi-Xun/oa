@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.daily.IDailyDao">
+
+  <resultMap id="resultMap" type="com.sega.application.oa.entity.daily.DailyEntity">
+    <id column="daily_id" property="dailyId"/><!-- 日报主键自维护 -->
+    <result column="daily_id" property="dailyId"/><!-- 日报主键自维护 -->
+    <result column="daily_send_date" property="dailySendDate"/><!-- 发送日期 -->
+    <result column="daily_send_date_tm" property="dailySendDateTm"/><!-- 发送日期 -->
+    <result column="dayil_user_id" property="dayilUserId"/><!-- 用户ID -->
+    <result column="dayil_user_name" property="dayilUserName"/><!-- 发送人 -->
+    <result column="daily_theme" property="dailyTheme"/><!-- 日报主题 -->
+    <result column="daily_file" property="dailyFile"/><!-- 附件 -->
+    <result column="daily_state" property="dailyState"/><!-- 日报发送状态 -->
+    <result column="daily_create_by" property="dailyCreateBy"/><!-- 日报创建人 -->
+    <result column="daily_create_date" property="dailyCreateDate"/><!-- 日报创建时间 -->
+    <result column="daily_update_by" property="dailyUpdateBy"/><!-- 日报更新人 -->
+    <result column="daily_update_date" property="dailyUpdateDate"/><!-- 日报更新时间 -->
+    <result column="daily_del" property="dailyDel"/><!-- 是否删除：0：未删除，1：已删除 -->
+    <result column="daily_sjr_name" property="dayilsjrName"/><!-- 是否删除：0：未删除，1：已删除 -->
+    <result column="daily_csr_name" property="dayilcsrName"/><!-- 是否删除：0：未删除，1：已删除 -->
+    <result column="daily_date" property="dailyDate"/><!-- 是否删除：0：未删除，1：已删除 -->
+    <result column="daily_send_ty" property="dailySendTy"/><!-- 发送标记 -->
+    <result column="daily_send_by" property="dailySendBy"/><!-- 发送方式 -->
+  </resultMap>
+
+  <!--查询字段-->
+  <sql id="dailyColumns">
+    daily_id,
+		daily_send_date,
+		daily_send_date_tm,
+		dayil_user_id,
+		dayil_user_name,
+		daily_theme,
+		daily_file,
+		daily_state,
+		daily_create_by,
+		daily_create_date,
+		daily_update_by,
+		daily_update_date,
+		daily_del,
+		daily_sjr_name,
+		daily_csr_name,
+		daily_date,
+		daily_send_ty,
+		daily_send_by
+  </sql>
+  <!--查询条件-->
+  <sql id="commonCondition">
+    <if test="dailyId != null and dailyId != ''">and daily_id=#{dailyId}</if>
+    <if test="dailySendDate != null">and daily_send_date=#{dailySendDate}</if>
+    <if test="dailySendDateTm != null">and daily_send_dateTm=#{dailySendDateTm}</if>
+    <if test="dayilUserId != null">and dayil_user_id=#{dayilUserId}</if>
+    <if test="dayilUserName != null and dayilUserName != ''">and dayil_user_name LIKE CONCAT(CONCAT('%',
+      #{dayilUserName}), '%')
+    </if>
+    <if test="dailyTheme != null and dailyTheme != ''">and daily_theme LIKE CONCAT(CONCAT('%', #{dailyTheme}), '%')</if>
+    <if test="dailyFile != null and dailyFile != ''">and daily_file LIKE CONCAT(CONCAT('%', #{dailyFile}), '%')</if>
+    <if test="dailyState != null and dailyState != ''">and daily_state LIKE CONCAT(CONCAT('%', #{dailyState}), '%')</if>
+    <if test="dailyCreateBy != null">and daily_create_by=#{dailyCreateBy}</if>
+    <if test="dailyCreateDate != null">and daily_create_date=#{dailyCreateDate}</if>
+    <if test="dailyUpdateBy != null">and daily_update_by=#{dailyUpdateBy}</if>
+    <if test="dailyUpdateDate != null">and daily_update_date=#{dailyUpdateDate}</if>
+    <if test="dailyDel != null">and daily_del=#{dailyDel}</if>
+    <if test="dayilsjrName != null and dayilsjrName != ''">and daily_sjr_name=#{dayilsjrName}</if>
+    <if test="dayilcsrName != null">and daily_csr_name=#{dayilcsrName}</if>
+  </sql>
+
+  <!-- 条件查询 -->
+  <select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyEntity">
+    select <include refid="dailyColumns"></include> from daily
+    <where>
+      <include refid="commonCondition"></include>
+      <if test="startDate != null">and date_format(daily_date, '%Y-%m-%d') >= date_format(#{startDate},
+        '%Y-%m-%d')
+      </if>
+      <if test="endDate != null">
+        <![CDATA[ and date_format(daily_date, '%Y-%m-%d') <= date_format(#{endDate}, '%Y-%m-%d') ]]></if>
+      and ifnull(daily_del,0) =0
+    </where>
+    order by daily_id desc
+  </select>
+  <select id="queryXs" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyEntity">
+    select <include refid="dailyColumns"></include> from daily
+    join `user` on daily.dayil_user_id = `user`.user_id
+    where user_department_id in (
+    select department_id from department
+    where department_parent_id = #{vo.dayilUserId}
+    )
+    <if test="vo.startDate != null">and date_format(daily_date, '%Y-%m-%d') >= date_format(#{vo.startDate},
+      '%Y-%m-%d')
+    </if>
+    <if test="vo.endDate != null">
+      <![CDATA[ and date_format(daily_date, '%Y-%m-%d') <= date_format(#{vo.endDate}, '%Y-%m-%d') ]]></if>
+    <if test="vo.dailyTheme != null and vo.dailyTheme != ''">and daily_theme LIKE CONCAT(CONCAT('%', #{vo.dailyTheme}),
+      '%')
+    </if>
+    <if test="vo.dayilUserName != null and vo.dayilUserName != ''">and dayil_user_name LIKE CONCAT(CONCAT('%',
+      #{vo.dayilUserName}), '%')
+    </if>
+    <if test="vo.dayilsjrName != null and vo.dayilsjrName != ''">and daily_sjr_name=#{vo.dayilsjrName}</if>
+    and ifnull(daily_del,0) =0
+    order by daily_id desc
+  </select>
+  <!-- 保存 -->
+  <insert id="saveEntity" useGeneratedKeys="true" keyProperty="dailyId"
+          parameterType="com.sega.application.oa.entity.daily.DailyEntity">
+    insert into daily
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="dailySendDate != null">daily_send_date,</if>
+      <if test="dailySendDateTm != null">daily_send_date_tm,</if>
+      <if test="dayilUserId != null">dayil_user_id,</if>
+      <if test="dayilUserName != null">dayil_user_name,</if>
+      <if test="dailyTheme != null">daily_theme,</if>
+      <if test="dailyFile != null">daily_file,</if>
+      <if test="dailyState != null">daily_state,</if>
+      <if test="dailyCreateBy != null">daily_create_by,</if>
+      <if test="dailyCreateDate != null">daily_create_date,</if>
+      <if test="dailyUpdateBy != null">daily_update_by,</if>
+      <if test="dailyUpdateDate != null">daily_update_date,</if>
+      <if test="dayilsjrName != null">daily_sjr_name,</if>
+      <if test="dayilcsrName != null">daily_csr_name,</if>
+
+      <if test="dailyDel != null">daily_del,</if>
+      <if test="dailyDate != null">daily_date,</if>
+      <if test="dailySendTy != null">daily_send_ty,</if>
+      <if test="dailySendBy != null">daily_send_by,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="dailySendDate != null">#{dailySendDate},</if>
+      <if test="dailySendDateTm != null">#{dailySendDateTm},</if>
+      <if test="dayilUserId != null">#{dayilUserId},</if>
+      <if test="dayilUserName != null">#{dayilUserName},</if>
+      <if test="dailyTheme != null">#{dailyTheme},</if>
+      <if test="dailyFile != null">#{dailyFile},</if>
+      <if test="dailyState != null">#{dailyState},</if>
+      <if test="dailyCreateBy != null">#{dailyCreateBy},</if>
+      <if test="dailyCreateDate != null">#{dailyCreateDate},</if>
+      <if test="dailyUpdateBy != null">#{dailyUpdateBy},</if>
+      <if test="dailyUpdateDate != null">#{dailyUpdateDate},</if>
+      <if test="dayilsjrName != null">#{dayilsjrName},</if>
+      <if test="dayilcsrName != null">#{dayilcsrName},</if>
+
+      <if test="dailyDel != null">#{dailyDel},</if>
+      <if test="dailyDate != null">#{dailyDate},</if>
+      <if test="dailySendTy != null">#{dailySendTy},</if>
+      <if test="dailySendBy != null">#{dailySendBy},</if>
+    </trim>
+  </insert>
+
+  <!-- 批量保存 -->
+  <insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="dailyId">
+    insert into daily
+    (daily_send_date,daily_send_date_tm,dayil_user_id,dayil_user_name,daily_theme,daily_file,daily_state,daily_create_by,daily_create_date,daily_update_by,daily_update_date,daily_del,daily_sjr_name,daily_csr_name,daily_date,daily_send_ty,daily_send_by,)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.dailySendDate},#{item.dailySendDateTm},#{item.dayilUserId},#{item.dayilUserName},#{item.dailyTheme},#{item.dailyFile},#{item.dailyState},#{item.dailyCreateBy},#{item.dailyCreateDate},#{item.dailyUpdateBy},#{item.dailyUpdateDate},#{item.dailyDel},#{item.dayilsjrName},#{item.dayilcsrName},#{item.dailyDate},#{item.dailySendTy},#{item.dailySendBy},)
+    </foreach>
+  </insert>
+
+  <!-- 更新 -->
+  <update id="updateEntity" parameterType="com.sega.application.oa.entity.daily.DailyEntity">
+    update daily
+    <set>
+      <if test="dailySendDate != null">daily_send_date=#{dailySendDate},</if>
+      <if test="dailySendDateTm != null">daily_send_date_tm=#{dailySendDateTm},</if>
+      <if test="dayilUserId != null">dayil_user_id=#{dayilUserId},</if>
+      <if test="dayilUserName != null">dayil_user_name=#{dayilUserName},</if>
+      <if test="dailyTheme != null">daily_theme=#{dailyTheme},</if>
+      <if test="dailyFile != null">daily_file=#{dailyFile},</if>
+      <if test="dailyState != null">daily_state=#{dailyState},</if>
+      <if test="dailyCreateBy != null">daily_create_by=#{dailyCreateBy},</if>
+      <if test="dailyCreateDate != null">daily_create_date=#{dailyCreateDate},</if>
+      <if test="dailyUpdateBy != null">daily_update_by=#{dailyUpdateBy},</if>
+      <if test="dailyUpdateDate != null">daily_update_date=#{dailyUpdateDate},</if>
+      <if test="dailyDel != null">daily_del=#{dailyDel},</if>
+      <if test="dayilsjrName != null">daily_sjr_name=#{dayilsjrName},</if>
+      <if test="dayilcsrName != null">daily_csr_name=#{dayilcsrName},</if>
+      <if test="dailyDate != null">daily_date=#{dailyDate},</if>
+      <if test="dailySendTy != null">daily_Send_Ty=#{dailySendTy},</if>
+      <if test="dailySendBy != null">daily_send_by=#{dailySendBy},</if>
+    </set>
+    <where>
+      <if test="dailyId != null">and daily_id=#{dailyId}</if>
+      <if test="idArray != null">
+        daily_id in
+        <foreach collection="idArray" item="item" index="index"
+                 open="(" separator="," close=")">#{item}
+        </foreach>
+      </if>
+    </where>
+  </update>
+
+  <!-- 根据id获取 -->
+  <select id="getById" resultMap="resultMap" parameterType="long">
+    select *
+    from daily
+    where daily_id = #{dailyId}
+      and daily_del = 0
+  </select>
+
+  <!-- 根据实体获取 -->
+  <select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyEntity">
+    select * from daily
+    <where>
+      <if test="dailyId != null">and daily_id=#{dailyId}</if>
+      <if test="dailySendDate != null">and daily_send_date=#{dailySendDate}</if>
+      <if test="dailySendDateTm != null">and daily_send_date_tm=#{dailySendDateTm}</if>
+      <if test="dayilUserId != null">and dayil_user_id=#{dayilUserId}</if>
+      <if test="dayilUserName != null">and dayil_user_name=#{dayilUserName}</if>
+      <if test="dailyTheme != null">and daily_theme=#{dailyTheme}</if>
+      <if test="dailyFile != null">and daily_file=#{dailyFile}</if>
+      <if test="dailyState != null">and daily_state=#{dailyState}</if>
+      <if test="dailyCreateBy != null">and daily_create_by=#{dailyCreateBy}</if>
+      <if test="dailyCreateDate != null">and daily_create_date=#{dailyCreateDate}</if>
+      <if test="dailyUpdateBy != null">and daily_update_by=#{dailyUpdateBy}</if>
+      <if test="dailyUpdateDate != null">and daily_update_date=#{dailyUpdateDate}</if>
+      <if test="dailyDel != null">and daily_del=#{dailyDel}</if>
+      and daily_del=0
+    </where>
+    limit 0,1
+  </select>
+
+  <!-- 删除 -->
+  <delete id="deleteById" parameterType="int">
+    update daily
+    set daily_del=1
+    where daily_id = #{dailyId}
+  </delete>
+
+  <!-- 批量删除 -->
+  <delete id="deleteByIds">
+    update daily set daily_del=1
+    <where>
+      daily_id in
+      <foreach collection="ids" item="item" index="index"
+               open="(" separator="," close=")">#{item}
+      </foreach>
+    </where>
+  </delete>
+
+  <!-- 根据实体删除 -->
+  <select id="deleteEntity" parameterType="com.sega.application.oa.entity.daily.DailyEntity">
+    update daily set daily_del=1
+    <where>
+      <if test="dailyId != null">and daily_id=#{dailyId}</if>
+      <if test="dailySendDate != null">and daily_send_date=#{dailySendDate}</if>
+      <if test="dailySendDateTm != null">and daily_send_date_tm=#{dailySendDateTm}</if>
+      <if test="dayilUserId != null">and dayil_user_id=#{dayilUserId}</if>
+      <if test="dayilUserName != null">and dayil_user_name=#{dayilUserName}</if>
+      <if test="dailyTheme != null">and daily_theme=#{dailyTheme}</if>
+      <if test="dailyFile != null">and daily_file=#{dailyFile}</if>
+      <if test="dailyState != null">and daily_state=#{dailyState}</if>
+      <if test="dailyCreateBy != null">and daily_create_by=#{dailyCreateBy}</if>
+      <if test="dailyCreateDate != null">and daily_create_date=#{dailyCreateDate}</if>
+      <if test="dailyUpdateBy != null">and daily_update_by=#{dailyUpdateBy}</if>
+      <if test="dailyUpdateDate != null">and daily_update_date=#{dailyUpdateDate}</if>
+      <if test="dailyDel != null">and daily_del=#{dailyDel}</if>
+    </where>
+  </select>
+
+  <!-- 查询全部 -->
+  <select id="queryAll" resultMap="resultMap">
+    select *
+    from daily
+    where daily_del = 0
+    order by daily_id desc
+  </select>
+  <select id="queryList" resultMap="resultMap">
+    select * from daily where daily_del=0
+    <if test="vo.startDate != null">and date_format(daily_send_date, '%Y-%m-%d') >= date_format(#{vo.startDate},
+      '%Y-%m-%d')
+    </if>
+    <if test="vo.endDate != null">
+      <![CDATA[ and date_format(daily_send_date, '%Y-%m-%d') <= date_format(#{vo.endDate}, '%Y-%m-%d') ]]></if>
+    order by daily_id desc
+  </select>
+  <select id="getDfs" resultMap="resultMap">
+    select *
+    from daily
+    where daily_del = 0
+      and (daily_send_ty = 0 or daily_send_ty is null)
+      and date_format(daily_send_date_tm, '%Y-%m-%d %H:%i:%S')<![CDATA[ <=]]> date_format(now(),
+                                                                                          '%Y-%m-%d %H:%i:%S')
+  </select>
+  <select id="queryTodyByUserId" resultType="java.lang.Integer">
+    select count(*)
+    from daily
+    where daily_del = 0
+      and daily_send_ty = 1
+      and dayil_user_id = #{userId}
+      and date_format(daily_Create_Date, '%Y-%m-%d') = date_format(now(), '%Y-%m-%d')
+  </select>
+
+
+</mapper>

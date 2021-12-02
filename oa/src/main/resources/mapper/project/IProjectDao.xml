@@ -1,0 +1,287 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.IProjectDao">
+
+    <resultMap id="resultMap" type="com.sega.application.oa.entity.project.ProjectEntity">
+        <id column="project_id" property="projectId"/><!-- 项目id  -->
+        <result column="project_id" property="projectId"/><!-- 项目id  -->
+        <result column="project_name" property="projectName"/><!-- 项目名称 -->
+        <result column="project_manager_id" property="projectManagerId"/><!-- 项目管理Id -->
+        <result column="prject_manager_name" property="prjectManagerName"/><!-- 项目管理名称 -->
+        <result column="project_customer" property="projectCustomer"/><!--  -->
+        <result column="project_budget" property="projectBudget"/><!--  -->
+        <result column="project_remark" property="projectRemark"/><!-- 备注 -->
+        <result column="project_state" property="projectState"/><!-- 0：未启动，1:进行中，2：已结束 -->
+        <result column="project_create_by" property="projectCreateBy"/><!-- 项目创建人 -->
+        <result column="project_create_date" property="projectCreateDate"/><!-- 项目创建时间 -->
+        <result column="project_update_by" property="projectUpdateBy"/><!-- 项目更新人 -->
+        <result column="project_update_date" property="projectUpdateDate"/><!-- 项目更新时间 -->
+        <result column="project_del" property="projectDel"/><!-- 是否删除：0：未删除，1：已删除 -->
+      <result column="approval_date" property="approvalDate"/>   <!-- 项目上线时间 -->
+      <result column="launch_date" property="launchDate"/>   <!-- 项目上线时间 -->
+      <result column="acceptance_date" property="acceptanceDate"/><!-- 项目验收时间 -->
+    </resultMap>
+
+    <!--查询字段-->
+    <sql id="projectColumns">
+		project_id,
+		project_name,
+		project_manager_id,
+		prject_manager_name,
+		project_customer,
+		project_budget,
+		project_remark,
+		project_state,
+		project_create_by,
+		project_create_date,
+		project_update_by,
+		project_update_date,
+		approval_date,
+		launch_date,
+		acceptance_date,
+		project_del
+	</sql>
+
+    <!--查询条件-->
+    <sql id="commonCondition">
+        <if test="projectId != null and projectId != ''">and project_id=#{projectId}</if>
+        <if test="projectName != null and projectName != ''">and project_name LIKE CONCAT(CONCAT('%', #{projectName}),
+            '%')
+        </if>
+        <if test="projectManagerId != null">and project_manager_id=#{projectManagerId}</if>
+        <if test="prjectManagerName != null and prjectManagerName != ''">and prject_manager_name LIKE CONCAT(CONCAT('%',
+            #{prjectManagerName}), '%')
+        </if>
+        <if test="projectCustomer != null and projectCustomer != ''">and project_customer LIKE CONCAT(CONCAT('%',
+            #{projectCustomer}), '%')
+        </if>
+        <if test="projectBudget != null">and project_budget=#{projectBudget}</if>
+        <if test="projectRemark != null and projectRemark != ''">and project_remark LIKE CONCAT(CONCAT('%',
+            #{projectRemark}), '%')
+        </if>
+        <if test="projectState != null">and project_state=#{projectState}</if>
+        <if test="projectCreateBy != null">and project_create_by=#{projectCreateBy}</if>
+        <if test="projectCreateDate != null">and project_create_date=#{projectCreateDate}</if>
+        <if test="projectUpdateBy != null">and project_update_by=#{projectUpdateBy}</if>
+        <if test="projectUpdateDate != null">and project_update_date=#{projectUpdateDate}</if>
+      <if test="approvalDate != null">and approval_date=#{approvalDate}</if>
+      <if test="launchDate != null">and launch_date=#{launchDate}</if>
+      <if test="acceptanceDate != null">and acceptance_date=#{acceptanceDate}</if>
+        <if test="projectDel != null">and project_del=#{projectDel}</if>
+
+    </sql>
+
+    <!-- 条件查询 -->
+    <select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.project.ProjectEntity">
+        select <include refid="projectColumns"></include> from project
+        <where>
+            <include refid="commonCondition"></include>
+            and project_del=0
+        </where>
+        order by project_id desc
+    </select>
+
+    <select id="queryuserByprojectId" resultType="java.util.Map">
+      SELECT
+     	userlog.user_name userName,
+     	prom.pm_user_id userId,
+     	department.department_name userDepartmentName,
+     	role.role_name userRole,
+     	if(userlog.user_gender=0,'男','女') userGender,
+     	userlog.user_email userEmail,
+     	userlog.user_address userddress,
+     	prom.pm_project_id projectId,
+     	pro.project_name projectName,
+        prom.pm_id pmId
+      FROM USER userlog
+	  LEFT JOIN project_member prom ON userlog.user_id = prom.pm_user_id AND ifnull( prom.pm_del, 0 ) = 0
+	  LEFT JOIN department ON userlog.user_department_id = department.department_id and ifnull( department.department_del, 0 ) = 0
+	  LEFT JOIN role ON role_id = user_role_id  and ifnull( role.role_del, 0 ) = 0
+	  left join project pro on pro.project_id = prom.pm_project_id and ifnull( pro.project_del, 0 ) = 0
+      WHERE
+	  userlog.user_del = 0
+	  AND prom.pm_project_id =#{projectId}
+	</select>
+
+    <!-- 保存 -->
+    <insert id="saveEntity" useGeneratedKeys="true" keyProperty="projectId"
+            parameterType="com.sega.application.oa.entity.project.ProjectEntity">
+        insert into project
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="projectName != null">project_name,</if>
+            <if test="projectManagerId != null">project_manager_id,</if>
+            <if test="prjectManagerName != null">prject_manager_name,</if>
+            <if test="projectCustomer != null">project_customer,</if>
+            <if test="projectBudget != null">project_budget,</if>
+            <if test="projectRemark != null">project_remark,</if>
+            <if test="projectState != null">project_state,</if>
+            <if test="projectCreateBy != null">project_create_by,</if>
+            <if test="projectCreateDate != null">project_create_date,</if>
+            <if test="projectUpdateBy != null">project_update_by,</if>
+            <if test="projectUpdateDate != null">project_update_date,</if>
+          <if test="approvalDate != null">approval_date,</if>
+          <if test="launchDate != null">launch_date,</if>
+          <if test="acceptanceDate != null">acceptance_date,</if>
+            <if test="projectDel != null">project_del</if>
+
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="projectName != null">#{projectName},</if>
+            <if test="projectManagerId != null">#{projectManagerId},</if>
+            <if test="prjectManagerName != null">#{prjectManagerName},</if>
+            <if test="projectCustomer != null">#{projectCustomer},</if>
+            <if test="projectBudget != null">#{projectBudget},</if>
+            <if test="projectRemark != null">#{projectRemark},</if>
+            <if test="projectState != null">#{projectState},</if>
+            <if test="projectCreateBy != null">#{projectCreateBy},</if>
+            <if test="projectCreateDate != null">#{projectCreateDate},</if>
+            <if test="projectUpdateBy != null">#{projectUpdateBy},</if>
+            <if test="projectUpdateDate != null">#{projectUpdateDate},</if>
+            <if test="approvalDate != null">#{approvalDate},</if>
+            <if test="launchDate != null">#{launchDate},</if>
+            <if test="acceptanceDate  != null">#{acceptanceDate},</if>
+            <if test="projectDel != null">#{projectDel}</if>
+        </trim>
+    </insert>
+
+    <!-- 批量保存 -->
+    <insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="projectId">
+        insert into project
+        (project_name,project_manager_id,prject_manager_name,project_customer,project_budget,project_remark,project_state,project_create_by,project_create_date,project_update_by,project_update_date,project_del,launch_date,acceptance_date,approval_date)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.projectName},#{item.projectManagerId},#{item.prjectManagerName},#{item.projectCustomer},#{item.projectBudget},#{item.projectRemark},#{item.projectState},#{item.projectCreateBy},#{item.projectCreateDate},#{item.projectUpdateBy},#{item.projectUpdateDate},#{item.projectDel},#{item.launchDate},#{item.acceptanceDate},#{item.approvalDate})
+        </foreach>
+    </insert>
+
+    <!-- 更新 -->
+    <update id="updateEntity" parameterType="com.sega.application.oa.entity.project.ProjectEntity">
+        update project
+        <set>
+            <if test="projectName != null">project_name=#{projectName},</if>
+            <if test="projectManagerId != null">project_manager_id=#{projectManagerId},</if>
+            <if test="prjectManagerName != null">prject_manager_name=#{prjectManagerName},</if>
+            <if test="projectCustomer != null">project_customer=#{projectCustomer},</if>
+            <if test="projectBudget != null">project_budget=#{projectBudget},</if>
+            <if test="projectRemark != null">project_remark=#{projectRemark},</if>
+            <if test="projectState != null">project_state=#{projectState},</if>
+            <if test="projectCreateBy != null">project_create_by=#{projectCreateBy},</if>
+            <if test="projectCreateDate != null">project_create_date=#{projectCreateDate},</if>
+            <if test="projectUpdateBy != null">project_update_by=#{projectUpdateBy},</if>
+            <if test="projectUpdateDate != null">project_update_date=#{projectUpdateDate},</if>
+          <if test="approvalDate != null">approval_date=#{approvalDate},</if>
+          <if test="launchDate != null">launch_date=#{launchDate},</if>
+          <if test="acceptanceDate != null">acceptance_date=#{acceptanceDate},</if>
+            <if test="projectDel != null">project_del=#{projectDel}</if>
+        </set>
+        <where>
+            <if test="projectId != null">and project_id=#{projectId}</if>
+            <if test="idArray != null">
+                project_id in
+                <foreach collection="idArray" item="item" index="index"
+                         open="(" separator="," close=")">#{item}
+                </foreach>
+            </if>
+        </where>
+    </update>
+
+    <!-- 根据id获取 -->
+    <select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+		select * from project where project_id=#{projectId} and project_del=0
+	</select>
+
+    <!-- 根据实体获取 -->
+    <select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.project.ProjectEntity">
+        select * from project
+        <where>
+            <if test="projectId != null">and project_id=#{projectId}</if>
+            <if test="projectName != null">and project_name=#{projectName}</if>
+            <if test="projectManagerId != null">and project_manager_id=#{projectManagerId}</if>
+            <if test="prjectManagerName != null">and prject_manager_name=#{prjectManagerName}</if>
+            <if test="projectCustomer != null">and project_customer=#{projectCustomer}</if>
+            <if test="projectBudget != null">and project_budget=#{projectBudget}</if>
+            <if test="projectRemark != null">and project_remark=#{projectRemark}</if>
+            <if test="projectState != null">and project_state=#{projectState}</if>
+            <if test="projectCreateBy != null">and project_create_by=#{projectCreateBy}</if>
+            <if test="projectCreateDate != null">and project_create_date=#{projectCreateDate}</if>
+            <if test="projectUpdateBy != null">and project_update_by=#{projectUpdateBy}</if>
+            <if test="projectUpdateDate != null">and project_update_date=#{projectUpdateDate}</if>
+          <if test="approvalDate != null">and approval_date=#{approvalDate}</if>
+          <if test="launchDate != null">and launch_date=#{launchDate}</if>
+          <if test="acceptanceDate != null">and acceptance_date=#{acceptanceDate}</if>
+            <if test="projectDel != null">and project_del=#{projectDel}</if>
+
+            and project_del=0
+        </where>
+        limit 0,1
+    </select>
+
+    <!-- 删除 -->
+    <delete id="deleteById" parameterType="java.lang.Long">
+		update project set project_del=1 where project_id=#{projectId}
+	</delete>
+
+    <!-- 批量删除 -->
+    <delete id="deleteByIds">
+        update project set project_del=1
+        <where>
+            project_id in
+            <foreach collection="ids" item="item" index="index"
+                     open="(" separator="," close=")">#{item}
+            </foreach>
+        </where>
+    </delete>
+
+    <!-- 根据实体删除 -->
+    <select id="deleteEntity" parameterType="com.sega.application.oa.entity.project.ProjectEntity">
+        update project set project_del=1
+        <where>
+            <if test="projectId != null">and project_id=#{projectId}</if>
+            <if test="projectName != null">and project_name=#{projectName}</if>
+            <if test="projectManagerId != null">and project_manager_id=#{projectManagerId}</if>
+            <if test="prjectManagerName != null">and prject_manager_name=#{prjectManagerName}</if>
+            <if test="projectCustomer != null">and project_customer=#{projectCustomer}</if>
+            <if test="projectBudget != null">and project_budget=#{projectBudget}</if>
+            <if test="projectRemark != null">and project_remark=#{projectRemark}</if>
+            <if test="projectState != null">and project_state=#{projectState}</if>
+            <if test="projectCreateBy != null">and project_create_by=#{projectCreateBy}</if>
+            <if test="projectCreateDate != null">and project_create_date=#{projectCreateDate}</if>
+            <if test="projectUpdateBy != null">and project_update_by=#{projectUpdateBy}</if>
+            <if test="projectUpdateDate != null">and project_update_date=#{projectUpdateDate}</if>
+          <if test="approvalDate != null">and approval_date=#{approvalDate}</if>
+          <if test="launchDate != null">and launch_date=#{launchDate}</if>
+          <if test="acceptanceDate != null">and acceptance_date=#{acceptanceDate}</if>
+            <if test="projectDel != null">and project_del=#{projectDel}</if>
+
+        </where>
+    </select>
+
+    <!-- 查询全部 -->
+    <select id="queryAll" resultMap="resultMap">
+		select * from project where project_del=0 order by project_id desc
+	</select>
+
+  <!-- 条件查询 -->
+  <select id="queryByPage" resultMap="resultMap" parameterType="com.sega.application.oa.entity.project.ProjectEntity">
+    select <include refid="projectColumns"></include>,group_concat(pm_user_id) projectMemberStr,group_concat(pm_user_name) projectMemberNames
+    from project
+    left join project_member on project_id = pm_project_id and pm_del=0
+    <where>
+      <include refid="commonCondition"></include>
+      and project_del=0
+    </where>
+    group by project_id
+    order by project_id desc
+  </select>
+
+  <select id="queryByProjectId" resultMap="resultMap">
+    select <include refid="projectColumns"></include>
+    from project
+    where project_del=0
+    <if test="projectId!=null and projectId!=''">
+      and project_id = #{projectId}
+    </if>
+    group by project_id
+    order by project_id desc
+  </select>
+</mapper>

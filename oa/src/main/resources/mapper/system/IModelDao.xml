@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.IModelDao">
+
+  <resultMap id="resultMap" type="com.sega.application.oa.entity.system.ModelEntity">
+    <id column="model_id" property="modelId"/><!-- -->
+    <result column="model_id" property="modelId"/><!-- -->
+    <result column="model_name" property="modelName"/><!--模块名称 -->
+    <result column="model_url" property="modelUrl"/><!--模块名称 -->
+    <result column="model_code" property="modelCode"/><!--模块编号 标准长10位，每两位表示一层级 -->
+    <result column="model_describe" property="modelDescribe"/><!--模块描述 -->
+    <result column="model_parent_id" property="modelParentId"/><!--模块父id -->
+    <result column="create_by" property="createBy"/><!--创建人 -->
+    <result column="create_date" property="createDate"/><!-- -->
+    <result column="update_by" property="updateBy"/><!-- -->
+    <result column="update_date" property="updateDate"/><!-- -->
+    <result column="model_del" property="modelDel"/><!--是否已删除：0：未删除，1:已删除 -->
+  </resultMap>
+
+  <!--保存-->
+  <insert id="saveEntity" useGeneratedKeys="true" keyProperty="modelId"
+          parameterType="com.sega.application.oa.entity.system.ModelEntity">
+    insert into model
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="modelName != null">model_name,</if>
+      <if test="modelUrl != null">model_url,</if>
+      <if test="modelCode != null">model_code,</if>
+      <if test="modelDescribe != null">model_describe,</if>
+      <if test="modelParentId != null">model_parent_id,</if>
+      <if test="createBy != null">create_by,</if>
+      <if test="createDate != null">create_date,</if>
+      <if test="updateBy != null">update_by,</if>
+      <if test="updateDate != null">update_date,</if>
+      <if test="modelDel != null">model_del,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="modelName != null">#{modelName},</if>
+      <if test="modelUrl != null">#{modelUrl},</if>
+      <if test="modelCode != null">#{modelCode},</if>
+      <if test="modelDescribe != null">#{modelDescribe},</if>
+      <if test="modelParentId != null">#{modelParentId},</if>
+      <if test="createBy != null">#{createBy},</if>
+      <if test="createDate != null">#{createDate},</if>
+      <if test="updateBy != null">#{updateBy},</if>
+      <if test="updateDate != null">#{updateDate},</if>
+      <if test="modelDel != null">#{modelDel},</if>
+    </trim>
+  </insert>
+
+  <!--更新-->
+  <update id="updateEntity" parameterType="com.sega.application.oa.entity.system.ModelEntity">
+    update model
+    <set>
+      <if test="modelName != null">model_name=#{modelName},</if>
+      <if test="modelUrl != null">model_url=#{modelUrl},</if>
+      <if test="modelCode != null">model_code=#{modelCode},</if>
+      <if test="modelDescribe != null">model_describe=#{modelDescribe},</if>
+      <if test="modelParentId != null">model_parent_id=#{modelParentId},</if>
+      <if test="createBy != null">create_by=#{createBy},</if>
+      <if test="createDate != null">create_date=#{createDate},</if>
+      <if test="updateBy != null">update_by=#{updateBy},</if>
+      <if test="updateDate != null">update_date=#{updateDate},</if>
+      <if test="modelDel != null">model_del=#{modelDel},</if>
+    </set>
+    where model_id = #{modelId} and model_del=0
+  </update>
+
+  <!--根据id获取-->
+  <select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+    select *
+    from model
+    where model_id = #{modelId}
+      and model_del = 0
+  </select>
+
+  <!--根据实体获取-->
+  <select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.ModelEntity">
+    select * from model
+    <where>
+      <if test="modelId != null">and model_id=#{modelId}</if>
+      <if test="modelUrl != null">and model_url=#{modelUrl}</if>
+      <if test="modelName != null">and model_name=#{modelName}</if>
+      <if test="modelCode != null">and model_code=#{modelCode}</if>
+      <if test="modelDescribe != null">and model_describe=#{modelDescribe}</if>
+      <if test="modelParentId != null">and model_parent_id=#{modelParentId}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="modelDel != null">and model_del=#{modelDel}</if>
+      and model_del=0
+    </where>
+    order by model_id
+    limit 0,1
+  </select>
+
+  <!--删除-->
+  <delete id="deleteById" parameterType="java.lang.Long">
+    update model
+    set model_del=1
+    where model_id = #{modelId}
+  </delete>
+
+  <!--批量删除-->
+  <delete id="deleteByIds">
+    update model set model_del=1
+    <where>
+      model_id in
+      <foreach collection="ids" item="item" index="index"
+               open="(" separator="," close=")">#{item}
+      </foreach>
+    </where>
+  </delete>
+
+  <!--根据实体删除-->
+  <select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.ModelEntity">
+    update model set model_del=1
+    <where>
+      <if test="modelId != null">and model_id=#{modelId}</if>
+      <if test="modelName != null">and model_name=#{modelName}</if>
+      <if test="modelUrl != null">and model_url=#{modelUrl}</if>
+      <if test="modelCode != null">and model_code=#{modelCode}</if>
+      <if test="modelDescribe != null">and model_describe=#{modelDescribe}</if>
+      <if test="modelParentId != null">and model_parent_id=#{modelParentId}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="modelDel != null">and model_del=#{modelDel}</if>
+    </where>
+  </select>
+
+  <!--查询全部-->
+  <select id="queryAll" resultMap="resultMap">
+    select *
+    from model
+    where model_del = 0
+    order by model_id desc
+  </select>
+
+  <!--条件查询-->
+  <select id="query" resultMap="resultMap">
+    select * from model
+    <where>
+      <if test="modelId != null">and model_id=#{modelId}</if>
+      <if test="modelUrl != null">and model_url=#{modelUrl}</if>
+      <if test="modelName != null">and model_name=#{modelName}</if>
+      <if test="modelCode != null">and model_code=#{modelCode}</if>
+      <if test="modelDescribe != null">and model_describe=#{modelDescribe}</if>
+      <if test="modelParentId != null">and model_parent_id=#{modelParentId}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="modelDel != null">and model_del=#{modelDel}</if>
+      and model_del=0
+    </where>
+    order by model_id desc
+  </select>
+
+  <!--查询未绑定在指定角色下的菜单-->
+  <select id="queryNotBind" resultMap="resultMap" parameterType="java.lang.Long">
+    SELECT *
+    FROM model
+    WHERE model.model_id NOT IN (select rm_model_id FROM role_model WHERE rm_role_id = #{roleId})
+      and model_del = 0
+    order by model_id desc
+  </select>
+  <select id="checkByModelCode" resultType="java.lang.Integer">
+    select count(model_id)
+    from model
+    where model_code = #{modelCode}
+    and model_del = 0
+    <if test="modelId!=null and modelId!=''">
+      and model_id!=#{modelId}
+    </if>
+  </select>
+</mapper>

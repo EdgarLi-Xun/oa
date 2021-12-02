@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.IFixedAssetsDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.administration.FixedAssetsEntity">
+		<id column="fa_id" property="faId" /><!-- 固定资产Id -->
+		<result column="fa_id" property="faId" /><!-- 固定资产Id -->
+		<result column="fa_name" property="faName" /><!-- 固定资产名称 -->
+		<result column="fa_code" property="faCode" /><!-- 固定资产编号 -->
+		<result column="fa_responsible_id" property="faResponsibleId" /><!-- 责任人Id -->
+		<result column="fa_responsible_name" property="faResponsibleName" /><!-- 责任人名称 -->
+		<result column="fa_price" property="faPrice" /><!-- 价格 -->
+		<result column="fa_remark" property="faRemark" /><!-- 备注 -->
+		<result column="fa_state" property="faState" /><!-- 资产状态：0：在用，1：丢失，2：停用，3：维修，4：外借 -->
+		<result column="fa_create_by" property="faCreateBy" /><!-- 创建人 -->
+		<result column="fa_create_date" property="faCreateDate" /><!-- 创建时间 -->
+		<result column="fa_update_by" property="faUpdateBy" /><!-- 更新人 -->
+		<result column="fa_update_date" property="faUpdateDate" /><!-- 更新时间 -->
+		<result column="fa_del" property="faDel" /><!-- 是否删除：0：未删除，1：已删除 -->
+	</resultMap>
+	
+	<!--查询字段-->
+	<sql id="fixedAssetsColumns">
+		fa_id,
+		fa_name,
+		fa_code,
+		fa_responsible_id,
+		fa_responsible_name,
+		fa_price,
+		fa_remark,
+		fa_state,
+		fa_create_by,
+		fa_create_date,
+		fa_update_by,
+		fa_update_date,
+		fa_del
+	</sql>
+	
+	<!--查询条件-->
+	<sql id="commonCondition">
+        <if test="faId != null and faId != ''"> and fa_id=#{faId}</if>
+		<if test="faName != null and faName != ''"> and fa_name LIKE CONCAT(CONCAT('%', #{faName}), '%')</if>
+		<if test="faCode != null and faCode != ''"> and fa_code LIKE CONCAT(CONCAT('%', #{faCode}), '%')</if>
+		<if test="faResponsibleId != null"> and fa_responsible_id=#{faResponsibleId}</if>
+		<if test="faResponsibleName != null and faResponsibleName != ''"> and fa_responsible_name LIKE CONCAT(CONCAT('%', #{faResponsibleName}), '%')</if>
+		<if test="faPrice != null"> and fa_price=#{faPrice}</if>
+		<if test="faRemark != null and faRemark != ''"> and fa_remark LIKE CONCAT(CONCAT('%', #{faRemark}), '%')</if>
+		<if test="faState != null"> and fa_state=#{faState}</if>
+		<if test="faCreateBy != null and faCreateBy != ''"> and fa_create_by LIKE CONCAT(CONCAT('%', #{faCreateBy}), '%')</if>
+		<if test="faCreateDate != null"> and fa_create_date=#{faCreateDate}</if>
+		<if test="faUpdateBy != null"> and fa_update_by=#{faUpdateBy}</if>
+		<if test="faUpdateDate != null"> and fa_update_date=#{faUpdateDate}</if>
+		<if test="faDel != null"> and fa_del=#{faDel}</if>
+    </sql>
+
+	<!-- 条件查询 -->	
+	<select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.administration.FixedAssetsEntity">
+		select <include refid="fixedAssetsColumns"></include> from fixed_assets
+		<where>
+			<include refid="commonCondition"></include>
+			and fa_del=0
+		</where>
+		order by fa_id desc
+	</select>
+
+	<!-- 保存 -->
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="faId"
+		parameterType="com.sega.application.oa.entity.administration.FixedAssetsEntity" >
+		insert into fixed_assets
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="faName != null">fa_name,</if>
+			<if test="faCode != null">fa_code,</if>
+			<if test="faResponsibleId != null">fa_responsible_id,</if>
+			<if test="faResponsibleName != null">fa_responsible_name,</if>
+			<if test="faPrice != null">fa_price,</if>
+			<if test="faRemark != null">fa_remark,</if>
+			<if test="faState != null">fa_state,</if>
+			<if test="faCreateBy != null">fa_create_by,</if>
+			<if test="faCreateDate != null">fa_create_date,</if>
+			<if test="faUpdateBy != null">fa_update_by,</if>
+			<if test="faUpdateDate != null">fa_update_date,</if>
+
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="faName != null">#{faName},</if>
+			<if test="faCode != null">#{faCode},</if>
+			<if test="faResponsibleId != null">#{faResponsibleId},</if>
+			<if test="faResponsibleName != null">#{faResponsibleName},</if>
+			<if test="faPrice != null">#{faPrice},</if>
+			<if test="faRemark != null">#{faRemark},</if>
+			<if test="faState != null">#{faState},</if>
+			<if test="faCreateBy != null">#{faCreateBy},</if>
+			<if test="faCreateDate != null">#{faCreateDate},</if>
+			<if test="faUpdateBy != null">#{faUpdateBy},</if>
+			<if test="faUpdateDate != null">#{faUpdateDate},</if>
+		</trim>
+	</insert>
+
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="faId">
+		insert into fixed_assets (fa_name,fa_code,fa_responsible_id,fa_responsible_name,fa_price,fa_remark,fa_state,fa_create_by,fa_create_date,fa_update_by,fa_update_date,fa_del,) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.faName},#{item.faCode},#{item.faResponsibleId},#{item.faResponsibleName},#{item.faPrice},#{item.faRemark},#{item.faState},#{item.faCreateBy},#{item.faCreateDate},#{item.faUpdateBy},#{item.faUpdateDate},#{item.faDel},)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.administration.FixedAssetsEntity">
+		update fixed_assets
+		<set>
+			<if test="faName != null">fa_name=#{faName},</if>
+			<if test="faCode != null">fa_code=#{faCode},</if>
+			<if test="faResponsibleId != null">fa_responsible_id=#{faResponsibleId},</if>
+			<if test="faResponsibleName != null">fa_responsible_name=#{faResponsibleName},</if>
+			<if test="faPrice != null">fa_price=#{faPrice},</if>
+			<if test="faRemark != null">fa_remark=#{faRemark},</if>
+			<if test="faState != null">fa_state=#{faState},</if>
+			<if test="faCreateBy != null">fa_create_by=#{faCreateBy},</if>
+			<if test="faCreateDate != null">fa_create_date=#{faCreateDate},</if>
+			<if test="faUpdateBy != null">fa_update_by=#{faUpdateBy},</if>
+			<if test="faUpdateDate != null">fa_update_date=#{faUpdateDate},</if>
+			<if test="faDel != null">fa_del=#{faDel},</if>
+		</set>
+		<where>
+			<if test="faId != null"> and fa_id=#{faId}</if>
+			<if test="idArray != null">
+				fa_id in <foreach collection="idArray" item="item" index="index"
+										open="(" separator="," close=")">#{item}</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 根据id获取 -->
+	<select id="getById" resultMap="resultMap" parameterType="int">
+		select * from fixed_assets where fa_id=#{faId} and fixed_assets_del=0
+	</select>
+
+	<!-- 根据实体获取 -->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.administration.FixedAssetsEntity">
+		select * from fixed_assets
+		<where>
+			<if test="faId != null"> and fa_id=#{faId}</if>
+			<if test="faName != null"> and fa_name=#{faName}</if>
+			<if test="faCode != null"> and fa_code=#{faCode}</if>
+			<if test="faResponsibleId != null"> and fa_responsible_id=#{faResponsibleId}</if>
+			<if test="faResponsibleName != null"> and fa_responsible_name=#{faResponsibleName}</if>
+			<if test="faPrice != null"> and fa_price=#{faPrice}</if>
+			<if test="faRemark != null"> and fa_remark=#{faRemark}</if>
+			<if test="faState != null"> and fa_state=#{faState}</if>
+			<if test="faCreateBy != null"> and fa_create_by=#{faCreateBy}</if>
+			<if test="faCreateDate != null"> and fa_create_date=#{faCreateDate}</if>
+			<if test="faUpdateBy != null"> and fa_update_by=#{faUpdateBy}</if>
+			<if test="faUpdateDate != null"> and fa_update_date=#{faUpdateDate}</if>
+			<if test="faDel != null"> and fa_del=#{faDel}</if>
+			and fixed_assets_del=0
+		</where>
+		limit 0,1
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteById" parameterType="int">
+		update fixed_assets set fixed_assets_del=1 where fa_id=#{faId}
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" >
+		update fixed_assets set fixed_assets_del=1
+		<where>
+			fa_id in <foreach collection="ids" item="item" index="index"
+									open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+
+	<!-- 根据实体删除 -->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.administration.FixedAssetsEntity">
+		update fixed_assets set fixed_assets_del=1
+		<where>
+			<if test="faId != null"> and fa_id=#{faId}</if>
+			<if test="faName != null"> and fa_name=#{faName}</if>
+			<if test="faCode != null"> and fa_code=#{faCode}</if>
+			<if test="faResponsibleId != null"> and fa_responsible_id=#{faResponsibleId}</if>
+			<if test="faResponsibleName != null"> and fa_responsible_name=#{faResponsibleName}</if>
+			<if test="faPrice != null"> and fa_price=#{faPrice}</if>
+			<if test="faRemark != null"> and fa_remark=#{faRemark}</if>
+			<if test="faState != null"> and fa_state=#{faState}</if>
+			<if test="faCreateBy != null"> and fa_create_by=#{faCreateBy}</if>
+			<if test="faCreateDate != null"> and fa_create_date=#{faCreateDate}</if>
+			<if test="faUpdateBy != null"> and fa_update_by=#{faUpdateBy}</if>
+			<if test="faUpdateDate != null"> and fa_update_date=#{faUpdateDate}</if>
+			<if test="faDel != null"> and fa_del=#{faDel}</if>
+		</where>
+	</select>
+
+	<!-- 查询全部 -->
+	<select id="queryAll" resultMap="resultMap">
+		select * from fixed_assets where fa_del=0 order by fa_id desc
+	</select>
+
+	<select id="queryStatistics" resultType="java.util.Map">
+		select  fa_name faName,sum(fa_price) price,COUNT(*) num from fixed_assets where fa_del = 0 GROUP BY fa_name ORDER BY fa_id desc
+
+	</select>
+
+</mapper>

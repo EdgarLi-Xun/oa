@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.IStatisticsDao">
+
+  <select id="queryxmSr" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    SELECT
+    tt_user_name userName,
+    tt_project_name projectName,
+    sum( IF ( tt_task_type = 1, tt_spend, 0 ) ) demandTime,
+    sum( IF ( tt_task_type = 2, tt_spend, 0 ) ) develTime,
+    sum( IF ( tt_task_type = 3, tt_spend, 0 ) ) testTime,
+    sum( IF ( tt_task_type = 4, tt_spend, 0 ) ) ImplementTime,
+    sum( IF ( tt_task_type = 5, tt_spend, 0 ) ) otherTime
+    FROM
+    task_time
+    WHERE
+    tt_project_id = #{TjTaskDto.projectId}
+    and tt_date >= #{beforeDate}
+    and #{nowDate} >= tt_date
+    GROUP BY
+    tt_project_id
+  </select>
+
+  <select id="queryygSr" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    SELECT
+    tt_user_name userName,
+    tt_project_name projectName,
+    sum( IF ( tt_task_type = 1, tt_spend, 0 ) ) demandTime,
+    sum( IF ( tt_task_type = 2, tt_spend, 0 ) ) develTime,
+    sum( IF ( tt_task_type = 3, tt_spend, 0 ) ) testTime,
+    sum( IF ( tt_task_type = 4, tt_spend, 0 ) ) ImplementTime,
+    sum( IF ( tt_task_type = 5, tt_spend, 0 ) ) otherTime
+    FROM
+    task_time
+    WHERE
+    tt_user_id = #{TjTaskDto.userId}
+    and tt_date >= #{beforeDate}
+    and #{nowDate} >= tt_date
+    GROUP BY
+    tt_project_id
+  </select>
+
+  <select id="getObjectId" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    select tt_project_id  projectId from task_time GROUP BY tt_project_id desc
+  </select>
+
+  <select id="getUserId" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    select user_id userId
+    from user
+    where user_department_id >= #{num}
+    and #{num}+10 > user_department_id
+    <if test=" num == 10 ">or user_department_id = 20 or user_department_id = 30 </if>
+    GROUP BY user_id
+  </select>
+
+  <select id="getSjr" resultType="java.lang.String">
+    SELECT	user_email FROM USER WHERE user_department_id = #{depId}
+  </select>
+
+
+</mapper>

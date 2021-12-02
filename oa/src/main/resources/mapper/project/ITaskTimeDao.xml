@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.ITaskTimeDao">
+
+  <resultMap id="resultMap" type="com.sega.application.oa.entity.project.TaskTimeEntity">
+    <id column="tt_id" property="ttId"/><!-- 任务耗时 -->
+    <result column="tt_id" property="ttId"/><!-- 任务耗时 -->
+    <result column="tt_date" property="ttDate"/><!-- 日期 -->
+    <result column="tt_user_name" property="ttUserName"/><!-- 用户Id -->
+    <result column="tt_user_id" property="ttUserId"/><!-- 用户Id -->
+    <result column="tt_rate" property="ttRate"/><!-- 耗时 -->
+    <result column="tt_spend" property="ttSpend"/><!-- 耗时 -->
+    <result column="tt_project_id" property="ttProjectId"/><!-- 项目id  -->
+    <result column="tt_project_name" property="ttProjectName"/><!-- 项目名称 -->
+    <result column="tt_percentage" property="ttPercentage"/><!-- 百分比 -->
+    <result column="tt_type_detail" property="ttTypeDetail"/><!-- 具体任务 -->
+    <result column="tt_type" property="ttType"/><!-- 项目类型：0：项目任务，1：非项目任务 -->
+    <result column="tt_create_by" property="ttCreateBy"/><!-- 创建人 -->
+    <result column="tt_create_date" property="ttCreateDate"/><!-- 创建时间 -->
+    <result column="tt_update_by" property="ttUpdateBy"/><!--  -->
+    <result column="tt_update_date" property="ttUpdateDate"/><!--  -->
+    <result column="tt_del" property="ttDel"/><!-- 是否删除：0，未删除，1：已删除 -->
+    <result column="tt_task_type" property="ttTaskType"/><!-- 1需求、2开发、3测试、4实施、5其他 -->
+    <result column="tt_plan_spend" property="ttPlanSpend"/><!-- 计划工时 -->
+    <result column="tt_remarks" property="ttRemarks"/><!-- 备注 -->
+    <result column="tt_review" property="ttReview"/><!-- 备注 -->
+    <result column="tt_state" property="ttState"/><!-- 备注 -->
+  </resultMap>
+
+  <!--查询字段-->
+  <sql id="taskTimeColumns">
+    tt_id
+    ,
+		tt_date,
+		tt_user_id,
+		tt_user_name,
+		tt_rate,
+		tt_spend,
+		tt_project_id,
+		tt_project_name,
+		tt_percentage,
+		tt_type_detail,
+		tt_type,
+		tt_create_by,
+		tt_create_date,
+		tt_update_by,
+		tt_update_date,
+		tt_del,
+		tt_task_type,
+		tt_plan_spend,
+		tt_remarks,
+		tt_review,
+		tt_state
+  </sql>
+
+  <!--查询条件-->
+  <sql id="commonCondition">
+    <if test="ttId != null and ttId != ''">and tt_id=#{ttId}</if>
+    <if test="ttDateStart != null">and date_format(tt_date, '%Y-%m-%d') >= date_format(#{ttDateStart}, '%Y-%m-%d')</if>
+    <if test="ttDateEnd != null">
+      <![CDATA[ and date_format(tt_date, '%Y-%m-%d') <= date_format(#{ttDateEnd}, '%Y-%m-%d') ]]></if>
+    <if test="ttDate != null">and date_format(tt_date, '%Y-%m-%d')=date_format(#{ttDate}, '%Y-%m-%d')</if>
+    <if test="ttUserName != null and ttUserName!=''">and tt_user_name LIKE CONCAT(CONCAT('%', #{ttUserName}), '%')</if>
+    <if test="ttUserId != null">and tt_user_id=#{ttUserId}</if>
+    <if test="ttRate != null">and tt_rate=#{ttRate}</if>
+    <if test="ttSpend != null">and tt_spend=#{ttSpend}</if>
+    <if test="ttProjectId != null">and tt_project_id=#{ttProjectId}</if>
+    <if test="ttProjectName != null and ttProjectName != ''">and tt_project_name LIKE CONCAT(CONCAT('%',
+      #{ttProjectName}), '%')
+    </if>
+    <if test="ttPercentage != null">and tt_percentage=#{ttPercentage}</if>
+    <if test="ttTypeDetail != null and ttTypeDetail != ''">and tt_type_detail LIKE CONCAT(CONCAT('%', #{ttTypeDetail}),
+      '%')
+    </if>
+    <if test="ttType != null and ttType != ''">and tt_type LIKE CONCAT(CONCAT('%', #{ttType}), '%')</if>
+    <if test="ttCreateBy != null">and tt_create_by=#{ttCreateBy}</if>
+    <if test="ttCreateDate != null">and tt_create_date=#{ttCreateDate}</if>
+    <if test="ttUpdateBy != null">and tt_update_by=#{ttUpdateBy}</if>
+    <if test="ttUpdateDate != null">and tt_update_date=#{ttUpdateDate}</if>
+    <if test="ttDel != null">and tt_del=#{ttDel}</if>
+    <if test="ttTaskType != null and ttTaskType != ''">and tt_task_type=#{ttTaskType}</if>
+
+  </sql>
+
+  <select id="getTaskProject" resultType="com.sega.application.oa.entity.daily.vo.TjTaskVo">
+    select sum(tt_spend) as sumTask,tt_task_type as taskType,tt_project_id as projectId
+    from task_time
+    where
+    tt_del=0
+    <if test="vo.projectId!=null">
+      and tt_project_id = #{vo.projectId}
+    </if>
+    <if test="vo.userId!=null">
+      and tt_user_id = #{vo.userId}
+    </if>
+    group by tt_task_type,tt_project_id
+
+  </select>
+  <!-- 条件查询 -->
+  <select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.project.TaskTimeEntity">
+    select <include refid="taskTimeColumns"></include> from task_time
+    <where>
+      <include refid="commonCondition"></include>
+      and tt_del=0
+    </where>
+    order by tt_id desc
+  </select>
+
+  <select id="queryChildrenTask" resultMap="resultMap"
+          parameterType="com.sega.application.oa.entity.project.TaskTimeEntity">
+    select <include refid="taskTimeColumns"></include> from task_time time
+    join `user` on `user`.user_id = time.tt_user_id
+    left join project project on project.project_id=time.tt_project_id
+    <where>
+      time.tt_del=0
+      <if test="ttUserName != null and ttUserName!=''">and time.tt_user_name LIKE CONCAT(CONCAT('%',
+        #{ttUserName}),
+        '%')
+      </if>
+      <if test="code != null and code!=''">
+        and
+        `user`.user_department_id
+        in (
+        select department_id from department
+        where department_code LIKE concat(#{code},'%')
+        )
+
+      </if>
+      <if test="ttProjectId != null">and time.tt_project_id=#{ttProjectId}</if>
+      <if test="ttId != null and ttId != ''">and time.tt_id=#{ttId}</if>
+      <if test="ttUserId != null and ttUserId != ''">and project.project_manager_id=#{ttUserId}</if>
+      <if test="ttTaskType != null and ttTaskType != ''">and time.tt_task_type=#{ttTaskType}</if>
+      <if test="ttCreateBy != null">and time.tt_create_by=#{ttCreateBy}</if>
+      <if test="ttDateStart != null">andtime. date_format(tt_date, '%Y-%m-%d') >= date_format(#{ttDateStart},
+        '%Y-%m-%d')
+      </if>
+      <if test="ttDateEnd != null">
+        <![CDATA[ and date_format(time.tt_date, '%Y-%m-%d') <= date_format(#{ttDateEnd}, '%Y-%m-%d') ]]></if>
+      <if test="ttDate != null">and date_format(time.tt_date, '%Y-%m-%d')=date_format(#{ttDate}, '%Y-%m-%d')</if>
+
+    </where>
+    order by tt_id desc
+  </select>
+  <!-- 保存 -->
+  <insert id="saveEntity" useGeneratedKeys="true" keyProperty="ttId"
+          parameterType="com.sega.application.oa.entity.project.TaskTimeEntity">
+    insert into task_time
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="ttDate != null">tt_date,</if>
+      <if test="ttUserName != null">tt_user_name,</if>
+      <if test="ttUserId != null">tt_user_id,</if>
+      <if test="ttRate != null">tt_rate,</if>
+      <if test="ttSpend != null">tt_spend,</if>
+      <if test="ttProjectId != null">tt_project_id,</if>
+      <if test="ttProjectName != null">tt_project_name,</if>
+      <if test="ttPercentage != null">tt_percentage,</if>
+      <if test="ttTypeDetail != null">tt_type_detail,</if>
+      <if test="ttType != null">tt_type,</if>
+      <if test="ttCreateBy != null">tt_create_by,</if>
+      <if test="ttCreateDate != null">tt_create_date,</if>
+      <if test="ttUpdateBy != null">tt_update_by,</if>
+      <if test="ttUpdateDate != null">tt_update_date,</if>
+      <if test="ttDel != null">tt_del,</if>
+      <if test="ttTaskType != null and ttTaskType != ''">tt_task_type,</if>
+      <if test="ttPlanSpend != null">tt_plan_spend,</if>
+      <if test="ttRemarks != null and ttRemarks != ''">tt_remarks,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="ttDate != null">#{ttDate},</if>
+      <if test="ttUserName != null">#{ttUserName},</if>
+      <if test="ttUserId != null">#{ttUserId},</if>
+      <if test="ttSpend != null">#{ttRate},</if>
+      <if test="ttSpend != null">#{ttSpend},</if>
+      <if test="ttProjectId != null">#{ttProjectId},</if>
+      <if test="ttProjectName != null">#{ttProjectName},</if>
+      <if test="ttPercentage != null">#{ttPercentage},</if>
+      <if test="ttTypeDetail != null">#{ttTypeDetail},</if>
+      <if test="ttType != null">#{ttType},</if>
+      <if test="ttCreateBy != null">#{ttCreateBy},</if>
+      <if test="ttCreateDate != null">#{ttCreateDate},</if>
+      <if test="ttUpdateBy != null">#{ttUpdateBy},</if>
+      <if test="ttUpdateDate != null">#{ttUpdateDate},</if>
+      <if test="ttDel != null">#{ttDel},</if>
+      <if test="ttTaskType != null and ttTaskType != ''">#{ttTaskType},</if>
+      <if test="ttPlanSpend != null">#{ttPlanSpend},</if>
+      <if test="ttRemarks != null and ttRemarks != ''">#{ttRemarks},</if>
+    </trim>
+  </insert>
+
+  <!-- 批量保存 -->
+  <insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="ttId">
+    insert into task_time
+    (tt_date,tt_user_id,tt_user_name,tt_spend,tt_rate,tt_project_id,tt_project_name,tt_percentage,tt_type_detail,tt_type,tt_create_by,tt_create_date,tt_update_by,tt_update_date,tt_del,tt_task_type,tt_plan_spend,tt_remarks,)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.ttDate},#{item.ttUserId},#{item.ttUserName},#{item.ttSpend},#{item.ttRate},#{item.ttProjectId},#{item.ttProjectName},#{item.ttPercentage},#{item.ttTypeDetail},#{item.ttType},#{item.ttCreateBy},#{item.ttCreateDate},#{item.ttUpdateBy},#{item.ttUpdateDate},#{item.ttDel},#{item.ttTaskType},#{item.ttPlanSpend},#{item.ttRemarks},)
+    </foreach>
+  </insert>
+
+  <!-- 更新 -->
+  <update id="updateEntity" parameterType="com.sega.application.oa.entity.project.TaskTimeEntity">
+    update task_time
+    <set>
+      <if test="ttDate != null">tt_date=#{ttDate},</if>
+      <if test="ttUserName != null">tt_user_name=#{ttUserName},</if>
+      <if test="ttUserId != null">tt_user_id=#{ttUserId},</if>
+      <if test="ttRate != null">tt_rate=#{ttRate},</if>
+      <if test="ttSpend != null">tt_spend=#{ttSpend},</if>
+      <if test="ttProjectId != null">tt_project_id=#{ttProjectId},</if>
+      <if test="ttProjectName != null">tt_project_name=#{ttProjectName},</if>
+      <if test="ttPercentage != null">tt_percentage=#{ttPercentage},</if>
+      <if test="ttTypeDetail != null">tt_type_detail=#{ttTypeDetail},</if>
+      <if test="ttType != null">tt_type=#{ttType},</if>
+      <if test="ttCreateBy != null">tt_create_by=#{ttCreateBy},</if>
+      <if test="ttCreateDate != null">tt_create_date=#{ttCreateDate},</if>
+      <if test="ttUpdateBy != null">tt_update_by=#{ttUpdateBy},</if>
+      <if test="ttUpdateDate != null">tt_update_date=#{ttUpdateDate},</if>
+      <if test="ttDel != null">tt_del=#{ttDel},</if>
+      <if test="ttTaskType != null and ttTaskType != ''">tt_task_type=#{ttTaskType},</if>
+      <if test="ttPlanSpend != null">tt_plan_spend = #{ttPlanSpend},</if>
+      <if test="ttRemarks != null and ttRemarks != ''">tt_remarks = #{ttRemarks},</if>
+      <if test="ttState != null">tt_state = #{ttState},</if>
+      <if test="ttReview != null and ttReview != ''">tt_review = #{ttReview},</if>
+    </set>
+    <where>
+      <if test="ttId != null">and tt_id=#{ttId}</if>
+      <if test="idArray != null">
+        tt_id in
+        <foreach collection="idArray" item="item" index="index"
+                 open="(" separator="," close=")">#{item}
+        </foreach>
+      </if>
+    </where>
+  </update>
+
+  <!-- 根据id获取 -->
+  <select id="getById" resultMap="resultMap" parameterType="int">
+    select *
+    from task_time
+    where tt_id = #{ttId}
+      and tt_del = 0
+  </select>
+
+  <!-- 根据实体获取 -->
+  <select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.project.TaskTimeEntity">
+    select * from task_time
+    <where>
+      <if test="ttId != null">and tt_id=#{ttId}</if>
+      <if test="ttDate != null">and date_format(tt_date, '%Y-%m-%d')=date_format(#{ttDate}, '%Y-%m-%d')</if>
+      <if test="ttUserName != null">and tt_user_name=#{ttUserName}</if>
+      <if test="ttUserId != null">and tt_user_id=#{ttUserId}</if>
+      <if test="ttRate != null">and tt_rate=#{ttRate}</if>
+      <if test="ttSpend != null">and tt_spend=#{ttSpend}</if>
+      <if test="ttProjectId != null">and tt_project_id=#{ttProjectId}</if>
+      <if test="ttProjectName != null">and tt_project_name=#{ttProjectName}</if>
+      <if test="ttPercentage != null">and tt_percentage=#{ttPercentage}</if>
+      <if test="ttTypeDetail != null">and tt_type_detail=#{ttTypeDetail}</if>
+      <if test="ttType != null">and tt_type=#{ttType}</if>
+      <if test="ttCreateBy != null">and tt_create_by=#{ttCreateBy}</if>
+      <if test="ttCreateDate != null">and tt_create_date=#{ttCreateDate}</if>
+      <if test="ttUpdateBy != null">and tt_update_by=#{ttUpdateBy}</if>
+      <if test="ttUpdateDate != null">and tt_update_date=#{ttUpdateDate}</if>
+      <if test="ttDel != null">and tt_del=#{ttDel}</if>
+      <if test="ttTaskType != null">and tt_task_type=#{ttTaskType}</if>
+      <if test="ttPlanSpend != null">and tt_plan_spend = #{ttPlanSpend}</if>
+      <if test="ttRemarks != null and ttRemarks != ''">and tt_remarks = #{ttRemarks}</if>
+      and tt_del=0
+    </where>
+    limit 0,1
+  </select>
+
+  <!-- 删除 -->
+  <delete id="deleteById" parameterType="int">
+    update task_time
+    set tt_del=1
+    where tt_id = #{ttId}
+  </delete>
+
+  <!-- 批量删除 -->
+  <delete id="deleteByIds">
+    update task_time set tt_del=1
+    <where>
+      tt_id in
+      <foreach collection="ids" item="item" index="index"
+               open="(" separator="," close=")">#{item}
+      </foreach>
+    </where>
+  </delete>
+
+  <!-- 根据实体删除 -->
+  <select id="deleteEntity" parameterType="com.sega.application.oa.entity.project.TaskTimeEntity">
+    update task_time set tt_del=1
+    <where>
+      <if test="ttId != null">and tt_id=#{ttId}</if>
+      <if test="ttDate != null">and date_format(tt_date, '%Y-%m-%d')=date_format(#{ttDate}, '%Y-%m-%d')</if>
+      <if test="ttUserName != null">and tt_user_name=#{ttUserName}</if>
+      <if test="ttUserId != null">and tt_user_id=#{ttUserId}</if>
+      <if test="ttRate != null">and tt_rate=#{ttRate}</if>
+      <if test="ttSpend != null">and tt_spend=#{ttSpend}</if>
+      <if test="ttProjectId != null">and tt_project_id=#{ttProjectId}</if>
+      <if test="ttProjectName != null">and tt_project_name=#{ttProjectName}</if>
+      <if test="ttPercentage != null">and tt_percentage=#{ttPercentage}</if>
+      <if test="ttTypeDetail != null">and tt_type_detail=#{ttTypeDetail}</if>
+      <if test="ttType != null">and tt_type=#{ttType}</if>
+      <if test="ttCreateBy != null">and tt_create_by=#{ttCreateBy}</if>
+      <if test="ttCreateDate != null">and tt_create_date=#{ttCreateDate}</if>
+      <if test="ttUpdateBy != null">and tt_update_by=#{ttUpdateBy}</if>
+      <if test="ttUpdateDate != null">and tt_update_date=#{ttUpdateDate}</if>
+      <if test="ttDel != null">and tt_del=#{ttDel}</if>
+      <if test="ttTaskType != null">and tt_task_type=#{ttTaskType}</if>
+      <if test="ttPlanSpend != null">an tt_plan_spend = #{ttPlanSpend}</if>
+      <if test="ttRemarks != null and ttRemarks != ''">and tt_remarks = #{ttRemarks}</if>
+    </where>
+  </select>
+
+  <!-- 查询全部 -->
+  <select id="queryAll" resultMap="resultMap">
+    select *
+    from task_time
+    where tt_del = 0
+    order by tt_id desc
+  </select>
+
+  <select id="queryByPage" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    SELECT time.tt_user_name userName,
+    time.tt_project_name projectName,
+    sum(IF(dep.department_id = 20 , time.tt_spend, 0)) demandTime,
+    sum(IF(dep.department_id = 30 , time.tt_spend, 0)) develTime,
+    sum(IF(dep.department_id = 35 , time.tt_spend, 0)) testTime
+    FROM task_time time
+    left join ( SELECT user.user_id, if( dep.department_parent_id
+    in(20,30,35),dep.department_parent_id,dep.department_id ) department_id from USER user
+    LEFT JOIN department dep ON USER.user_department_id = dep.department_id ) dep on dep.user_id=time.tt_create_by
+    WHERE 1=1
+    <if test="vo.projectId != null and vo.projectId != ''">and time.tt_project_id = #{vo.projectId}</if>
+    <if test="vo.userId != null and vo.userId != ''">and time.tt_user_id = #{vo.userId}</if>
+    <if test="vo.startDate != null ">and time.tt_date >= #{vo.startDate}</if>
+    <if test="vo.endDate != null ">and #{vo.endDate} >= time.tt_date</if>
+    GROUP BY
+    time.tt_project_id
+  </select>
+
+  <select id="queryxmSr" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    SELECT time.tt_user_name                                 userName,
+           time.tt_project_name                              projectName,
+           sum(IF(dep.department_id = 35, time.tt_spend, 0)) demandTime,
+           sum(IF(dep.department_id = 20, time.tt_spend, 0)) develTime,
+           sum(IF(dep.department_id = 30, time.tt_spend, 0)) testTime
+    FROM task_time time
+           LEFT JOIN (SELECT user.user_id,
+                             if(dep.department_parent_id in (20, 30, 35), dep.department_parent_id,
+                                dep.department_id) department_id
+                      from USER user
+                             LEFT JOIN department dep ON USER.user_department_id = dep.department_id
+                      where dep.department_del = 0) dep on dep.user_id = time.tt_user_id
+    WHERE time.tt_project_id = #{TjTaskDto.projectId}
+      and time.tt_date >= #{beforeDate}
+      and #{nowDate} >= time.tt_date
+    GROUP BY time.tt_project_id
+  </select>
+
+
+  <select id="queryygSr" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    SELECT time.tt_user_name                                                                  userName,
+           time.tt_project_name                                                               projectName,
+           sum(IF(dep.department_id = 35, time.tt_spend, 0)) demandTime,
+           sum(IF(dep.department_id = 20, time.tt_spend, 0)) develTime,
+           sum(IF(dep.department_id = 30, time.tt_spend, 0)) testTime
+    FROM task_time time
+           LEFT JOIN (SELECT user.user_id,
+                             if(dep.department_parent_id in (20, 30, 35), dep.department_parent_id,
+                                dep.department_id) department_id
+                      from USER user
+                             LEFT JOIN department dep ON USER.user_department_id = dep.department_id
+                      where dep.department_del = 0) dep on dep.user_id = time.tt_user_id
+    WHERE time.tt_user_id = #{TjTaskDto.userId}
+      and time.tt_date >= #{beforeDate}
+      and #{nowDate} >= time.tt_date
+    GROUP BY time.tt_project_id
+  </select>
+
+  <select id="getObjectId" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    select tt_project_id projectId
+    from task_time
+    GROUP BY tt_project_id desc
+  </select>
+
+  <select id="getUserId" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    select tt_user_id userId
+    from task_time
+    GROUP BY tt_user_id desc
+  </select>
+  <select id="gsfsgstjDay" resultMap="resultMap">
+    select *
+    from task_time
+    where tt_del = 0
+      and DATE_FORMAT(tt_date, '%Y-%m-%d') = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+    order by tt_project_id;
+
+  </select>
+  <select id="gtTjTaskDay" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    SELECT time.tt_project_name                                                               projectName,
+           sum(IF(dep.department_id = 35, time.tt_spend, 0)) demandTime,
+           sum(IF(dep.department_id = 20, time.tt_spend, 0)) develTime,
+           sum(IF(dep.department_id = 30, time.tt_spend, 0)) testTime
+    FROM task_time time
+           LEFT JOIN (SELECT user.user_id,
+                             if(dep.department_parent_id in (20, 30, 35), dep.department_parent_id,
+                                dep.department_id) department_id
+                      from USER user
+                             LEFT JOIN department dep ON USER.user_department_id = dep.department_id
+                      where dep.department_del = 0) dep on dep.user_id = time.tt_user_id
+    WHERE time.tt_del = 0
+      and DATE_FORMAT(time.tt_date, '%Y-%m-%d') = DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+    GROUP BY time.tt_project_id
+    order by time.tt_project_id
+  </select>
+  <select id="gsfsgstjWeek" resultMap="resultMap">
+    select *
+    from task_time
+    where tt_del = 0
+      and tt_state = 2
+      and DATE_FORMAT(tt_date, '%Y-%m-%d') <![CDATA[<=]]> DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+      and DATE_FORMAT(tt_date, '%Y-%m-%d') <![CDATA[>=]]> DATE_SUB(CURDATE(), INTERVAL 8 DAY)
+    order by tt_project_id;
+  </select>
+  <select id="gtTjTaskWeek" resultType="com.sega.application.oa.entity.daily.dto.TjTaskDto">
+    SELECT time.tt_project_name                                                               projectName,
+           sum(IF(dep.department_id = 35, time.tt_spend, 0)) demandTime,
+           sum(IF(dep.department_id = 20, time.tt_spend, 0)) develTime,
+           sum(IF(dep.department_id = 30, time.tt_spend, 0)) testTime
+    FROM task_time time
+           LEFT JOIN (SELECT user.user_id,
+                             if(dep.department_parent_id in (20, 30, 35), dep.department_parent_id,
+                                dep.department_id) department_id
+                      from USER user
+                             LEFT JOIN department dep ON USER.user_department_id = dep.department_id
+                      where dep.department_del = 0) dep on dep.user_id = time.tt_user_id
+    WHERE time.tt_del = 0
+      and time.tt_state = 2
+      and DATE_FORMAT(time.tt_date, '%Y-%m-%d') <![CDATA[<=]]> DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+      and DATE_FORMAT(time.tt_date, '%Y-%m-%d') <![CDATA[>=]]> DATE_SUB(CURDATE(), INTERVAL 8 DAY)
+    GROUP BY time.tt_project_id
+    order by time.tt_project_id
+  </select>
+
+
+</mapper>

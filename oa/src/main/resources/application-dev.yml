@@ -1,0 +1,84 @@
+#tomcat端口
+server:
+  port: 8089
+#springboot的配置
+spring:
+  #定义数据源
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    name: oazy
+    #127.0.0.1为本机测试的ip，3306是mysql的端口号。serverTimezone是定义时区，照抄就好，mysql高版本需要定义这些东西
+    #useSSL也是某些高版本mysql需要问有没有用SSL连接
+    url: jdbc:mysql://localhost:3306/oa?nullCatalogMeansCurrent=true&useUnicode=true&characterEncoding=UTF-8&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=Asia/Shanghai
+    #数据库用户名，root为管理员
+    username: root
+    #该数据库用户的密码
+    password: 123456
+  main:
+    allow-bean-definition-overriding: true
+  #redis的配置
+  redis:
+    database: 0
+    host: 127.0.0.1
+    port: 6379
+    pool:
+      max-active: 8
+      max-wait: -1
+      min-idle: 0
+    timeout: 5000ms
+#mybatyis的配置
+mybatis:
+  mapper-locations: mapper/*/*.xml, classpath*:mapper/*.xml, classpath:/META-INF/modeler-mybatis-mappings/*.xml, classpath:mapper/**/*.xml #指定mapper的配置文件的路径是mapper文件夹下的所有 xml文件。
+  configuration-properties:
+    # 配置流程引擎参数，详情可见 DatabaseConfiguration
+    blobType: BLOB
+    boolValue: TRUE
+    # 不要设置库名，否则会出现双库名 bug
+    prefix: ''
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
+
+logging:
+  level:
+    com.sega.application.oa.dao.*: debug
+
+# AES密码加密私钥(Base64加密)
+encryptAESKey: V2FuZzkyNuYSKIuwqTQkFQSUpXVA
+# JWT认证加密私钥(Base64加密)
+encryptJWTKey: U0JBUElOENhspJrzkyNjQ1NA
+# AccessToken过期时间-5分钟-5*60(秒为单位)
+accessTokenExpireTime: 1800
+# RefreshToken过期时间-30分钟-30*60(秒为单位)
+refreshTokenExpireTime: 1800
+# Shiro缓存过期时间-5分钟-5*60(秒为单位)(一般设置与AccessToken过期时间一致)
+shiroCacheExpireTime: 1800
+
+#微信相关配置文件
+wechat:
+  corpsecret: qQDsjek1slU3ulCeao-dNxGtajzIjZTvpFWAtKOyT9E
+  tokenUrl: https://qyapi.weixin.qq.com/cgi-bin/gettoken
+  corpid: ww1c18a998b39d54fd
+  approvalUrl: https://qyapi.weixin.qq.com/cgi-bin/corp/getapprovaldata?access_token=
+
+shiroAnnPath: /checkLogin,/capsule-flowable
+
+#文件上传配置
+multipart:
+  maxFileSize: 2000Mb
+  maxRequestSize: 2500Mb
+
+#设置文件目录
+file:
+  path: /home/servers/oa/file
+
+flowable:
+  common:
+    app:
+      idm-url: /capsule-flowable
+
+
+
+

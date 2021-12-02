@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.IUserVacationDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.administration.UserVacationEntity">
+		<id column="uv_id" property="uvId" /><!--  -->
+		<result column="uv_id" property="uvId" /><!--  -->
+		<result column="uv_user_id" property="uvUserId" /><!-- 关联员工ID -->
+		<result column="uv_days" property="uvDays" /><!-- 休假天数，可以是复数 -->
+		<result column="uv_type" property="uvType" /><!-- 0:年假，1:调休，2：请假，3：加班 -->
+		<result column="uv_start_date" property="uvStartDate" /><!--  -->
+		<result column="uv_end_date" property="uvEndDate" /><!--  -->
+		<result column="uv_create_by" property="uvCreateBy" /><!--  -->
+		<result column="uv_create_date" property="uvCreateDate" /><!--  -->
+		<result column="uv_update_date" property="uvUpdateDate" /><!--  -->
+		<result column="uv_update_by" property="uvUpdateBy" /><!--  -->
+		<result column="uv_del" property="uvDel" /><!-- 是否删除：未删除,1：已删除 -->
+	</resultMap>
+	
+	<!--查询字段-->
+	<sql id="userVacationColumns">
+		uv_id,
+		uv_user_id,
+		uv_days,
+		uv_type,
+		uv_start_date,
+		uv_end_date,
+		uv_create_by,
+		uv_create_date,
+		uv_update_date,
+		uv_update_by,
+		uv_del
+	</sql>
+	
+	<!--查询条件-->
+	<sql id="commonCondition">
+        <if test="uvId != null and uvId != ''"> and uv_id=#{uvId}</if>
+		<if test="uvUserId != null"> and uv_user_id=#{uvUserId}</if>
+		<if test="uvDays != null"> and uv_days=#{uvDays}</if>
+		<if test="uvType != null"> and uv_type=#{uvType}</if>
+		<if test="uvStartDate != null"> and uv_start_date=#{uvStartDate}</if>
+		<if test="uvEndDate != null"> and uv_end_date=#{uvEndDate}</if>
+		<if test="uvCreateBy != null"> and uv_create_by=#{uvCreateBy}</if>
+		<if test="uvCreateDate != null"> and uv_create_date=#{uvCreateDate}</if>
+		<if test="uvUpdateDate != null"> and uv_update_date=#{uvUpdateDate}</if>
+		<if test="uvUpdateBy != null"> and uv_update_by=#{uvUpdateBy}</if>
+		<if test="uvDel != null"> and uv_del=#{uvDel}</if>
+    </sql>
+
+	<!-- 条件查询 -->	
+	<select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.administration.UserVacationEntity">
+		select <include refid="userVacationColumns"></include> from user_vacation
+		<where>
+			<include refid="commonCondition"></include>
+			and user_vacation_del=0
+		</where>
+		order by uv_id desc
+	</select>
+
+	<!-- 保存 -->
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="uvId"
+		parameterType="com.sega.application.oa.entity.administration.UserVacationEntity" >
+		insert into user_vacation
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="uvUserId != null">uv_user_id,</if>
+			<if test="uvDays != null">uv_days,</if>
+			<if test="uvType != null">uv_type,</if>
+			<if test="uvStartDate != null">uv_start_date,</if>
+			<if test="uvEndDate != null">uv_end_date,</if>
+			<if test="uvCreateBy != null">uv_create_by,</if>
+			<if test="uvCreateDate != null">uv_create_date,</if>
+			<if test="uvUpdateDate != null">uv_update_date,</if>
+			<if test="uvUpdateBy != null">uv_update_by,</if>
+			<if test="uvDel != null">uv_del,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="uvUserId != null">#{uvUserId},</if>
+			<if test="uvDays != null">#{uvDays},</if>
+			<if test="uvType != null">#{uvType},</if>
+			<if test="uvStartDate != null">#{uvStartDate},</if>
+			<if test="uvEndDate != null">#{uvEndDate},</if>
+			<if test="uvCreateBy != null">#{uvCreateBy},</if>
+			<if test="uvCreateDate != null">#{uvCreateDate},</if>
+			<if test="uvUpdateDate != null">#{uvUpdateDate},</if>
+			<if test="uvUpdateBy != null">#{uvUpdateBy},</if>
+			<if test="uvDel != null">#{uvDel},</if>
+		</trim>
+	</insert>
+
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="uvId">
+		insert into user_vacation (uv_user_id,uv_days,uv_type,uv_start_date,uv_end_date,uv_create_by,uv_create_date,uv_update_date,uv_update_by,uv_del,) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.uvUserId},#{item.uvDays},#{item.uvType},#{item.uvStartDate},#{item.uvEndDate},#{item.uvCreateBy},#{item.uvCreateDate},#{item.uvUpdateDate},#{item.uvUpdateBy},#{item.uvDel},)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.administration.UserVacationEntity">
+		update user_vacation
+		<set>
+			<if test="uvUserId != null">uv_user_id=#{uvUserId},</if>
+			<if test="uvDays != null">uv_days=#{uvDays},</if>
+			<if test="uvType != null">uv_type=#{uvType},</if>
+			<if test="uvStartDate != null">uv_start_date=#{uvStartDate},</if>
+			<if test="uvEndDate != null">uv_end_date=#{uvEndDate},</if>
+			<if test="uvCreateBy != null">uv_create_by=#{uvCreateBy},</if>
+			<if test="uvCreateDate != null">uv_create_date=#{uvCreateDate},</if>
+			<if test="uvUpdateDate != null">uv_update_date=#{uvUpdateDate},</if>
+			<if test="uvUpdateBy != null">uv_update_by=#{uvUpdateBy},</if>
+			<if test="uvDel != null">uv_del=#{uvDel},</if>
+		</set>
+		<where>
+			<if test="uvId != null"> and uv_id=#{uvId}</if>
+			<if test="idArray != null">
+				uv_id in <foreach collection="idArray" item="item" index="index"
+										open="(" separator="," close=")">#{item}</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 根据id获取 -->
+	<select id="getById" resultMap="resultMap" parameterType="int">
+		select * from user_vacation where uv_id=#{uvId} and user_vacation_del=0
+	</select>
+
+	<!-- 根据实体获取 -->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.administration.UserVacationEntity">
+		select * from user_vacation
+		<where>
+			<if test="uvId != null"> and uv_id=#{uvId}</if>
+			<if test="uvUserId != null"> and uv_user_id=#{uvUserId}</if>
+			<if test="uvDays != null"> and uv_days=#{uvDays}</if>
+			<if test="uvType != null"> and uv_type=#{uvType}</if>
+			<if test="uvStartDate != null"> and uv_start_date=#{uvStartDate}</if>
+			<if test="uvEndDate != null"> and uv_end_date=#{uvEndDate}</if>
+			<if test="uvCreateBy != null"> and uv_create_by=#{uvCreateBy}</if>
+			<if test="uvCreateDate != null"> and uv_create_date=#{uvCreateDate}</if>
+			<if test="uvUpdateDate != null"> and uv_update_date=#{uvUpdateDate}</if>
+			<if test="uvUpdateBy != null"> and uv_update_by=#{uvUpdateBy}</if>
+			<if test="uvDel != null"> and uv_del=#{uvDel}</if>
+			and user_vacation_del=0
+		</where>
+		limit 0,1
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteById" parameterType="int">
+		update user_vacation set user_vacation_del=1 where uv_id=#{uvId}
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" >
+		update user_vacation set user_vacation_del=1
+		<where>
+			uv_id in <foreach collection="ids" item="item" index="index"
+									open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+
+	<!-- 根据实体删除 -->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.administration.UserVacationEntity">
+		update user_vacation set user_vacation_del=1
+		<where>
+			<if test="uvId != null"> and uv_id=#{uvId}</if>
+			<if test="uvUserId != null"> and uv_user_id=#{uvUserId}</if>
+			<if test="uvDays != null"> and uv_days=#{uvDays}</if>
+			<if test="uvType != null"> and uv_type=#{uvType}</if>
+			<if test="uvStartDate != null"> and uv_start_date=#{uvStartDate}</if>
+			<if test="uvEndDate != null"> and uv_end_date=#{uvEndDate}</if>
+			<if test="uvCreateBy != null"> and uv_create_by=#{uvCreateBy}</if>
+			<if test="uvCreateDate != null"> and uv_create_date=#{uvCreateDate}</if>
+			<if test="uvUpdateDate != null"> and uv_update_date=#{uvUpdateDate}</if>
+			<if test="uvUpdateBy != null"> and uv_update_by=#{uvUpdateBy}</if>
+			<if test="uvDel != null"> and uv_del=#{uvDel}</if>
+		</where>
+	</select>
+
+	<!-- 查询全部 -->
+	<select id="queryAll" resultMap="resultMap">
+		select * from user_vacation where user_vacation_del=0 order by uv_id desc
+	</select>
+
+</mapper>

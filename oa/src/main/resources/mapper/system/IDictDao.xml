@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.IDictDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.system.DictEntity">
+		<id column="dict_id" property="dictId" /><!--  -->
+		<result column="dict_id" property="dictId" /><!--  -->
+		<result column="dict_partent_key" property="dictPartentKey" /><!-- 父级key -->
+		<result column="dict_key" property="dictKey" /><!-- key值，唯一 -->
+		<result column="dict_name" property="dictName" /><!-- 名称 -->
+		<result column="dict_value" property="dictValue" /><!-- key和name对应的value -->
+		<result column="dict_create_by" property="dictCreateBy" /><!-- 创建人 -->
+		<result column="dict_create_date" property="dictCreateDate" /><!-- 创建时间 -->
+		<result column="dict_update_by" property="dictUpdateBy" /><!-- 更新人 -->
+		<result column="dict_udpate_date" property="dictUdpateDate" /><!-- 更新时间 -->
+		<result column="dict_del" property="dictDel" /><!-- 是否删除：0未删除，1已删除 -->
+	</resultMap>
+	
+	<!--查询字段-->
+	<sql id="dictColumns">
+		dict_id,
+		dict_partent_key,
+		dict_key,
+		dict_name,
+		dict_value,
+		dict_create_by,
+		dict_create_date,
+		dict_update_by,
+		dict_udpate_date,
+		dict_del
+	</sql>
+	
+	<!--查询条件-->
+	<sql id="commonCondition">
+        <if test="dictId != null and dictId != ''"> and dict_id=#{dictId}</if>
+		<if test="dictPartentKey != null and dictPartentKey != ''"> and dict_partent_key LIKE CONCAT(CONCAT('%', #{dictPartentKey}), '%')</if>
+		<if test="dictKey != null and dictKey != ''"> and dict_key LIKE CONCAT(CONCAT('%', #{dictKey}), '%')</if>
+		<if test="dictName != null and dictName != ''"> and dict_name LIKE CONCAT(CONCAT('%', #{dictName}), '%')</if>
+		<if test="dictValue != null and dictValue != ''"> and dict_value LIKE CONCAT(CONCAT('%', #{dictValue}), '%')</if>
+		<if test="dictCreateBy != null"> and dict_create_by=#{dictCreateBy}</if>
+		<if test="dictCreateDate != null"> and dict_create_date=#{dictCreateDate}</if>
+		<if test="dictUpdateBy != null"> and dict_update_by=#{dictUpdateBy}</if>
+		<if test="dictUdpateDate != null"> and dict_udpate_date=#{dictUdpateDate}</if>
+		<if test="dictDel != null"> and dict_del=#{dictDel}</if>
+    </sql>
+
+	<!-- 条件查询 -->	
+	<select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.DictEntity">
+		select <include refid="dictColumns"></include> from dict
+		<where>
+			<include refid="commonCondition"></include>
+			and dict_del=0
+		</where>
+		order by dict_id desc
+	</select>
+
+	<!-- 保存 -->
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="dictId"
+		parameterType="com.sega.application.oa.entity.system.DictEntity" >
+		insert into dict
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="dictPartentKey != null">dict_partent_key,</if>
+			<if test="dictKey != null">dict_key,</if>
+			<if test="dictName != null">dict_name,</if>
+			<if test="dictValue != null">dict_value,</if>
+			<if test="dictCreateBy != null">dict_create_by,</if>
+			<if test="dictCreateDate != null">dict_create_date,</if>
+			<if test="dictUpdateBy != null">dict_update_by,</if>
+			<if test="dictUdpateDate != null">dict_udpate_date,</if>
+			<if test="dictDel != null">dict_del,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="dictPartentKey != null">#{dictPartentKey},</if>
+			<if test="dictKey != null">#{dictKey},</if>
+			<if test="dictName != null">#{dictName},</if>
+			<if test="dictValue != null">#{dictValue},</if>
+			<if test="dictCreateBy != null">#{dictCreateBy},</if>
+			<if test="dictCreateDate != null">#{dictCreateDate},</if>
+			<if test="dictUpdateBy != null">#{dictUpdateBy},</if>
+			<if test="dictUdpateDate != null">#{dictUdpateDate},</if>
+			<if test="dictDel != null">#{dictDel},</if>
+		</trim>
+	</insert>
+
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="dictId">
+		insert into dict (dict_partent_key,dict_key,dict_name,dict_value,dict_create_by,dict_create_date,dict_update_by,dict_udpate_date,dict_del,) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.dictPartentKey},#{item.dictKey},#{item.dictName},#{item.dictValue},#{item.dictCreateBy},#{item.dictCreateDate},#{item.dictUpdateBy},#{item.dictUdpateDate},#{item.dictDel},)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.system.DictEntity">
+		update dict
+		<set>
+			<if test="dictPartentKey != null">dict_partent_key=#{dictPartentKey},</if>
+			<if test="dictKey != null">dict_key=#{dictKey},</if>
+			<if test="dictName != null">dict_name=#{dictName},</if>
+			<if test="dictValue != null">dict_value=#{dictValue},</if>
+			<if test="dictCreateBy != null">dict_create_by=#{dictCreateBy},</if>
+			<if test="dictCreateDate != null">dict_create_date=#{dictCreateDate},</if>
+			<if test="dictUpdateBy != null">dict_update_by=#{dictUpdateBy},</if>
+			<if test="dictUdpateDate != null">dict_udpate_date=#{dictUdpateDate},</if>
+			<if test="dictDel != null">dict_del=#{dictDel},</if>
+		</set>
+		<where>
+			<if test="dictId != null"> and dict_id=#{dictId}</if>
+			<if test="idArray != null">
+				dict_id in <foreach collection="idArray" item="item" index="index"
+										open="(" separator="," close=")">#{item}</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 根据id获取 -->
+	<select id="getById" resultMap="resultMap" parameterType="int">
+		select * from dict where dict_id=#{dictId} and dict_del=0
+	</select>
+
+	<!-- 根据实体获取 -->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.DictEntity">
+		select * from dict
+		<where>
+			<if test="dictId != null"> and dict_id=#{dictId}</if>
+			<if test="dictPartentKey != null"> and dict_partent_key=#{dictPartentKey}</if>
+			<if test="dictKey != null"> and dict_key=#{dictKey}</if>
+			<if test="dictName != null"> and dict_name=#{dictName}</if>
+			<if test="dictValue != null"> and dict_value=#{dictValue}</if>
+			<if test="dictCreateBy != null"> and dict_create_by=#{dictCreateBy}</if>
+			<if test="dictCreateDate != null"> and dict_create_date=#{dictCreateDate}</if>
+			<if test="dictUpdateBy != null"> and dict_update_by=#{dictUpdateBy}</if>
+			<if test="dictUdpateDate != null"> and dict_udpate_date=#{dictUdpateDate}</if>
+			<if test="dictDel != null"> and dict_del=#{dictDel}</if>
+			and dict_del=0
+		</where>
+		limit 0,1
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteById" parameterType="int">
+		update dict set dict_del=1 where dict_id=#{dictId}
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" >
+		update dict set dict_del=1
+		<where>
+			dict_id in <foreach collection="ids" item="item" index="index"
+									open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+
+	<!-- 根据实体删除 -->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.DictEntity">
+		update dict set dict_del=1
+		<where>
+			<if test="dictId != null"> and dict_id=#{dictId}</if>
+			<if test="dictPartentKey != null"> and dict_partent_key=#{dictPartentKey}</if>
+			<if test="dictKey != null"> and dict_key=#{dictKey}</if>
+			<if test="dictName != null"> and dict_name=#{dictName}</if>
+			<if test="dictValue != null"> and dict_value=#{dictValue}</if>
+			<if test="dictCreateBy != null"> and dict_create_by=#{dictCreateBy}</if>
+			<if test="dictCreateDate != null"> and dict_create_date=#{dictCreateDate}</if>
+			<if test="dictUpdateBy != null"> and dict_update_by=#{dictUpdateBy}</if>
+			<if test="dictUdpateDate != null"> and dict_udpate_date=#{dictUdpateDate}</if>
+			<if test="dictDel != null"> and dict_del=#{dictDel}</if>
+		</where>
+	</select>
+
+	<!-- 查询全部 -->
+	<select id="queryAll" resultMap="resultMap">
+		select * from dict where dict_del=0 order by dict_id desc
+	</select>
+
+</mapper>

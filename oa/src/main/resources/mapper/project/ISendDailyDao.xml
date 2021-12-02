@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.ISendDailyDao">
+
+
+  <select id="getUserName" resultType="java.lang.String">
+    select dayil_user_name
+    from daily
+    where DATE_FORMAT(daily_date, '%Y-%m-%d') = DATE_FORMAT(#{nowDate}, '%Y-%m-%d')
+      and daily_send_ty = 1
+    GROUP BY dayil_user_name
+  </select>
+
+  <select id="getName" resultType="java.lang.String">
+    SELECT user_name
+    from user
+    where user_id = #{userId}
+      and user_del = 0
+  </select>
+
+  <select id="getEmail" resultType="java.lang.String">
+    select user_email
+    from user
+    where user_department_id = #{jsz}
+      and user_State = 0
+      and user_del = 0
+  </select>
+
+  <select id="getFsr" resultType="java.lang.String">
+    select fsr
+    from mailbox
+    where type = #{type}
+  </select>
+
+  <select id="getPassword" resultType="java.lang.String">
+    select email_password
+    from user
+    where user_email = #{fsr}
+  </select>
+
+  <select id="getJsr" resultType="com.sega.application.oa.entity.system.MailBox">
+    select mail_id,
+           type,
+           fsr,
+           jsr,
+           jsz,
+           csr,
+           csz,
+           mail_del,
+           remarks
+    from mailbox
+    where mail_id = #{jsr}
+  </select>
+  <select id="getUserId" resultType="com.sega.application.oa.entity.system.UserEntity">
+    select user_id,
+           user_name,
+           user_password,
+           user_department_id,
+           user_role_id,
+           user_state,
+           user_email,
+           user_telephone,
+           user_login_name,
+           user_gender,
+           user_age,
+           user_id_card,
+           user_address,
+           user_create_by,
+           user_create_date,
+           user_update_by,
+           user_update_date,
+           user_del,
+           email_password,
+           daily
+    from user
+    where daily = 1
+      and user_del = 0
+      and user_State = 0
+  </select>
+
+
+</mapper>

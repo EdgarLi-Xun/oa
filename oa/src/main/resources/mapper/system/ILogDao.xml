@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.ILogDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.system.LogEntity">
+		<id column="log_id" property="logId" /><!-- -->
+		<result column="log_id" property="logId" /><!-- -->
+		<result column="log_user_id" property="logUserId" /><!--操作用户id -->
+		<result column="log_department_id" property="logDepartmentId" /><!--操作部门id -->
+		<result column="log_module" property="logModule" /><!--操作模块 -->
+		<result column="log_model_code" property="logModelCode" /><!--操作模块 -->
+		<result column="log_table" property="logTable" /><!--操作表名 -->
+		<result column="log_business_key" property="logBusinessKey" /><!--记录日志的记录主键 -->
+		<result column="log_operation" property="logOperation" /><!--操作方法 -->
+		<result column="log_content" property="logContent" /><!--操作内容 -->
+		<result column="log_value" property="logValue" /><!--操作数据 -->
+		<result column="log_date" property="logDate" /><!--操作时间 -->
+		<result column="log_count" property="logCount" /><!--统计数量 -->
+		<association property="user" javaType="com.sega.application.oa.entity.system.UserEntity">
+			<result column="user_name" property="userName" />
+		</association>
+		<association property="department" column="log_department_id" select="com.sega.application.oa.dao.system.IDepartmentDao.getById" fetchType="lazy"></association>
+	</resultMap>
+	
+	<!--保存-->	
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="logId"
+		parameterType="com.sega.application.oa.entity.system.LogEntity" >
+		insert into log
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="logUserId != null">log_user_id,</if>
+			<if test="logDepartmentId != null">log_department_id,</if>
+			<if test="logModule != null">log_module,</if>
+			<if test="logModelCode != null">log_model_code,</if>
+			<if test="logTable != null">log_table,</if>
+			<if test="logBusinessKey != null">log_business_key,</if>
+			<if test="logOperation != null">log_operation,</if>
+			<if test="logContent != null">log_content,</if>
+			<if test="logValue != null">log_value,</if>
+			<if test="logDate != null">log_date,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="logUserId != null">#{logUserId},</if>
+			<if test="logDepartmentId != null">#{logDepartmentId},</if>
+			<if test="logModule != null">#{logModule},</if>
+			<if test="logModelCode != null">#{logModelCode},</if>
+			<if test="logTable != null">#{logTable},</if>
+			<if test="logBusinessKey != null">#{logBusinessKey},</if>
+			<if test="logOperation != null">#{logOperation},</if>
+			<if test="logContent != null">#{logContent},</if>
+			<if test="logValue != null">#{logValue},</if>
+			<if test="logDate != null">#{logDate},</if>
+		</trim>
+	</insert>
+	
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="logId">
+		insert into log (log_user_id,log_department_id,log_module,log_model_code,log_table,log_business_key,log_operation,log_content,log_date) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.logUserId},#{item.logDepartmentId},#{item.logModule},#{item.logModelCode},#{item.logTable},#{item.logBusinessKey},#{item.logOperation},#{item.logContent},#{item.logDate})
+		</foreach>
+	</insert>
+	
+	<!--更新-->	
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.system.LogEntity">
+		update log
+		<set>
+			<if test="logUserId != null">log_user_id=#{logUserId},</if>
+			<if test="logDepartmentId != null">log_department_id=#{logDepartmentId},</if>
+			<if test="logModule != null">log_module=#{logModule},</if>
+			<if test="logModelCode != null">log_model_code=#{logModelCode},</if>
+			<if test="logTable != null">log_table=#{logTable},</if>
+			<if test="logBusinessKey != null">log_business_key=#{logBusinessKey},</if>
+			<if test="logOperation != null">log_operation=#{logOperation},</if>
+			<if test="logContent != null">log_content=#{logContent},</if>
+			<if test="logValue != null">log_value=#{logValue},</if>
+			<if test="logDate != null">log_date=#{logDate},</if>
+		</set>
+		where log_id = #{logId}
+	</update>
+	
+	<!--根据id获取-->	
+	<select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+		select log.*,"user".user_name from log left join "user" on log_user_id = user_id where log_id=#{logId}
+	</select>
+	
+	<!--根据实体获取-->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.LogEntity">
+		select  log.*,"user".user_name from log left join "user" on log_user_id = user_id
+		<where>
+			<if test="logId != null"> and log_id=#{logId}</if>
+			<if test="logUserId != null"> and log_user_id=#{logUserId}</if>
+			<if test="logDepartmentId != null"> and log_department_id=#{logDepartmentId}</if>
+			<if test="logModule != null"> and log_module=#{logModule}</if>
+			<if test="logModelCode != null"> and log_model_code=#{logModelCode}</if>
+			<if test="logTable != null"> and log_table=#{logTable}</if>
+			<if test="logBusinessKey != null"> and log_business_key=#{logBusinessKey}</if>
+			<if test="logOperation != null"> and log_operation=#{logOperation}</if>
+			<if test="logContent != null"> and log_content=#{logContent}</if>
+			<if test="logValue != null">and log_value=#{logValue}</if>
+			<if test="logDate != null"> and log_date=#{logDate}</if>
+		</where>
+		order by log_id limit 0,1
+	</select>	
+	
+	<!--删除-->	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		delete from log where log_id=#{logId}
+	</delete>	
+	
+	<!--批量删除-->	
+	<delete id="deleteByIds" >
+		delete from log
+		<where>
+			 log_id in <foreach collection="ids" item="item" index="index" 
+			open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+	
+	<!--根据实体删除-->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.LogEntity">
+		delete from log
+		<where>
+			<if test="logId != null"> and log_id=#{logId}</if>
+			<if test="logUserId != null"> and log_user_id=#{logUserId}</if>
+			<if test="logDepartmentId != null"> and log_department_id=#{logDepartmentId}</if>
+			<if test="logModule != null"> and log_module=#{logModule}</if>
+			<if test="logModelCode != null"> and log_model_code=#{logModelCode}</if>
+			<if test="logTable != null"> and log_table=#{logTable}</if>
+			<if test="logBusinessKey != null"> and log_business_key=#{logBusinessKey}</if>
+			<if test="logOperation != null"> and log_operation=#{logOperation}</if>
+			<if test="logContent != null"> and log_content=#{logContent}</if>
+			<if test="logValue != null">and log_value=#{logValue}</if>
+			<if test="logDate != null"> and log_date=#{logDate}</if>
+		</where>
+	</select>
+	
+	<!--删除-->	
+	<delete id="deleteByDay" parameterType="java.lang.Long">
+		delete from log where DATEDIFF (day,log_date,getdate()) >  #{day};
+	</delete>
+	
+	<!--查询全部-->	
+	<select id="queryAll" resultMap="resultMap">
+		select log.*,"user".user_name  from log left join user on log_user_id = user_id order by log_id desc
+	</select>
+	
+	<!--条件查询-->	
+	<select id="query" resultMap="resultMap">
+		select log.*,"user".user_name from log
+			left join "user" on log_user_id = user_id
+		<where>
+			<if test="logId != null"> and log_id=#{logId}</if>
+			<if test="logUserId != null"> and log_user_id=#{logUserId}</if>
+			<if test="logDepartmentId != null"> and log_department_id=#{logDepartmentId}</if>
+			<if test="logModule != null"> and log_module=#{logModule}</if>
+			<if test="logModelCode != null"> and log_model_code=#{logModelCode}</if>
+			<if test="logTable != null"> and log_table=#{logTable}</if>
+			<if test="logBusinessKey != null"> and log_business_key=#{logBusinessKey}</if>
+			<if test="logOperation != null"> and log_operation=#{logOperation}</if>
+			<if test="logContent != null"> and log_content=#{logContent}</if>
+			<if test="logValue != null">and log_value=#{logValue}</if>
+			<if test="logDate != null"> and TO_DAYS(log_date)=TO_DAYS(#{logDate})</if>
+			and log_table &lt;&gt; ''
+		</where>
+		order by log_id desc
+	</select>
+	
+	<select id="analysis" resultMap="resultMap">
+		SELECT log_module, log_department_id, COUNT(*) as log_count
+		FROM log
+		<where>
+			<if test="logDepartmentId != null"> and log_department_id=#{logDepartmentId}</if>
+			<if test="logModuleSign != null"> and log_model_code like CONCAT('${logModuleSign}', '%')</if>
+			<if test="logModule != null"> and log_module=#{logModule}</if>
+			and log_table = ''
+			and log_model_code != null
+		</where>
+		GROUP BY log_module, log_department_id
+	</select>
+	
+</mapper>

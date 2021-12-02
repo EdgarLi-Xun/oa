@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.daily.IDailyPlanDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.daily.DailyPlanEntity">
+		<id column="dp_id" property="dpId" /><!--  -->
+		<result column="dp_id" property="dpId" /><!--  -->
+		<result column="dp_project_id" property="dpProjectId" /><!-- 项目id -->
+		<result column="dp_daily_id" property="dpDailyId" /><!-- 日报id -->
+		<result column="dp_plan_content" property="dpPlanContent" /><!-- 明日计划 -->
+		<result column="dp_plan_time" property="dpPlanTime" /><!-- 计划耗时 -->
+		<result column="dp_plan_remarks" property="dpPlanRemarks" /><!-- 备注 -->
+		<result column="dp_create_by" property="dpCreateBy" /><!-- 创建人 -->
+		<result column="dp_create_date" property="dpCreateDate" /><!-- 创建时间 -->
+		<result column="dp_update_by" property="dpUpdateBy" /><!-- 更新人 -->
+		<result column="dp_update_date" property="dpUpdateDate" /><!-- 更新时间 -->
+		<result column="dp_del" property="dpDel" /><!-- 是否已删除：0：未删除，1已删除 -->
+		<result column="dp_project_name" property="dpProjectName" />
+	</resultMap>
+	
+	<!--查询字段-->
+	<sql id="dailyPlanColumns">
+		dp_id,
+		dp_project_id,
+		dp_daily_id,
+		dp_plan_content,
+		dp_plan_time,
+		dp_plan_remarks,
+		dp_create_by,
+		dp_create_date,
+		dp_update_by,
+		dp_update_date,
+		dp_del,
+		dp_project_name
+	</sql>
+	
+	<!--查询条件-->
+	<sql id="commonCondition">
+        <if test="dpId != null and dpId != ''"> and dp_id=#{dpId}</if>
+		<if test="dpProjectId != null"> and dp_project_id=#{dpProjectId}</if>
+		<if test="dpDailyId != null"> and dp_daily_id=#{dpDailyId}</if>
+		<if test="dpPlanContent != null and dpPlanContent != ''"> and dp_plan_content LIKE CONCAT(CONCAT('%', #{dpPlanContent}), '%')</if>
+		<if test="dpPlanTime != null"> and dp_plan_time=#{dpPlanTime}</if>
+		<if test="dpPlanRemarks != null and dpPlanRemarks != ''"> and dp_plan_remarks LIKE CONCAT(CONCAT('%', #{dpPlanRemarks}), '%')</if>
+		<if test="dpCreateBy != null"> and dp_create_by=#{dpCreateBy}</if>
+		<if test="dpCreateDate != null"> and dp_create_date=#{dpCreateDate}</if>
+		<if test="dpUpdateBy != null"> and dp_update_by=#{dpUpdateBy}</if>
+		<if test="dpUpdateDate != null"> and dp_update_date=#{dpUpdateDate}</if>
+		<if test="dpDel != null"> and dp_del=#{dpDel}</if>
+		<if test="dpProjectName != null"> and dpProjectName=#{dpProjectName}</if>
+
+
+    </sql>
+
+	<!-- 条件查询 -->	
+	<select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyPlanEntity">
+		select <include refid="dailyPlanColumns"></include> from daily_plan
+		<where>
+			<include refid="commonCondition"></include>
+			and ifnull(dp_del,0)=0
+		</where>
+		order by dp_id desc
+	</select>
+
+	<!-- 保存 -->
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="dpId"
+		parameterType="com.sega.application.oa.entity.daily.DailyPlanEntity" >
+		insert into daily_plan
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="dpProjectId != null">dp_project_id,</if>
+			<if test="dpDailyId != null">dp_daily_id,</if>
+			<if test="dpPlanContent != null">dp_plan_content,</if>
+			<if test="dpPlanTime != null">dp_plan_time,</if>
+			<if test="dpPlanRemarks != null">dp_plan_remarks,</if>
+			<if test="dpCreateBy != null">dp_create_by,</if>
+			<if test="dpCreateDate != null">dp_create_date,</if>
+			<if test="dpUpdateBy != null">dp_update_by,</if>
+			<if test="dpUpdateDate != null">dp_update_date,</if>
+			<if test="dpDel != null">dp_del,</if>
+			<if test="dpProjectName != null">dp_project_name,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="dpProjectId != null">#{dpProjectId},</if>
+			<if test="dpDailyId != null">#{dpDailyId},</if>
+			<if test="dpPlanContent != null">#{dpPlanContent},</if>
+			<if test="dpPlanTime != null">#{dpPlanTime},</if>
+			<if test="dpPlanRemarks != null">#{dpPlanRemarks},</if>
+			<if test="dpCreateBy != null">#{dpCreateBy},</if>
+			<if test="dpCreateDate != null">#{dpCreateDate},</if>
+			<if test="dpUpdateBy != null">#{dpUpdateBy},</if>
+			<if test="dpUpdateDate != null">#{dpUpdateDate},</if>
+			<if test="dpDel != null">#{dpDel},</if>
+			<if test="dpProjectName != null">#{dpProjectName},</if>
+		</trim>
+	</insert>
+
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="dpId">
+		insert into daily_plan (dp_project_id,dp_daily_id,dp_plan_content,dp_plan_time,dp_plan_remarks,dp_create_by,dp_create_date,dp_update_by,dp_update_date,dp_del,dp_project_name,) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.dpProjectId},#{item.dpDailyId},#{item.dpPlanContent},#{item.dpPlanTime},#{item.dpPlanRemarks},#{item.dpCreateBy},#{item.dpCreateDate},#{item.dpUpdateBy},#{item.dpUpdateDate},#{item.dpDel},#{item.dpProjectName},)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.daily.DailyPlanEntity">
+		update daily_plan
+		<set>
+			<if test="dpProjectId != null">dp_project_id=#{dpProjectId},</if>
+			<if test="dpDailyId != null">dp_daily_id=#{dpDailyId},</if>
+			<if test="dpPlanContent != null">dp_plan_content=#{dpPlanContent},</if>
+			<if test="dpPlanTime != null">dp_plan_time=#{dpPlanTime},</if>
+			<if test="dpPlanRemarks != null">dp_plan_remarks=#{dpPlanRemarks},</if>
+			<if test="dpCreateBy != null">dp_create_by=#{dpCreateBy},</if>
+			<if test="dpCreateDate != null">dp_create_date=#{dpCreateDate},</if>
+			<if test="dpUpdateBy != null">dp_update_by=#{dpUpdateBy},</if>
+			<if test="dpUpdateDate != null">dp_update_date=#{dpUpdateDate},</if>
+			<if test="dpDel != null">dp_del=#{dpDel},</if>
+			<if test="dpProjectName != null">dp_project_name=#{dpProjectName},</if>
+
+
+		</set>
+		<where>
+			<if test="dpId != null"> and dp_id=#{dpId}</if>
+			<if test="idArray != null">
+				dp_id in <foreach collection="idArray" item="item" index="index"
+										open="(" separator="," close=")">#{item}</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 根据id获取 -->
+	<select id="getById" resultMap="resultMap" parameterType="int">
+		select * from daily_plan where dp_id=#{dpId} and daily_plan_del=0
+	</select>
+
+	<!-- 根据实体获取 -->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyPlanEntity">
+		select * from daily_plan
+		<where>
+			<if test="dpId != null"> and dp_id=#{dpId}</if>
+			<if test="dpProjectId != null"> and dp_project_id=#{dpProjectId}</if>
+			<if test="dpDailyId != null"> and dp_daily_id=#{dpDailyId}</if>
+			<if test="dpPlanContent != null"> and dp_plan_content=#{dpPlanContent}</if>
+			<if test="dpPlanTime != null"> and dp_plan_time=#{dpPlanTime}</if>
+			<if test="dpPlanRemarks != null"> and dp_plan_remarks=#{dpPlanRemarks}</if>
+			<if test="dpCreateBy != null"> and dp_create_by=#{dpCreateBy}</if>
+			<if test="dpCreateDate != null"> and dp_create_date=#{dpCreateDate}</if>
+			<if test="dpUpdateBy != null"> and dp_update_by=#{dpUpdateBy}</if>
+			<if test="dpUpdateDate != null"> and dp_update_date=#{dpUpdateDate}</if>
+			<if test="dpDel != null"> and dp_del=#{dpDel}</if>
+			<if test="dpProjectName != null"> and dp_project_name=#{dpProjectName}</if>
+
+			and daily_plan_del=0
+		</where>
+		limit 0,1
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteById" parameterType="int">
+		update daily_plan set daily_plan_del=1 where dp_id=#{dpId}
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" >
+		update daily_plan set daily_plan_del=1
+		<where>
+			dp_id in <foreach collection="ids" item="item" index="index"
+									open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+
+	<!-- 根据实体删除 -->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.daily.DailyPlanEntity">
+		update daily_plan set daily_plan_del=1
+		<where>
+			<if test="dpId != null"> and dp_id=#{dpId}</if>
+			<if test="dpProjectId != null"> and dp_project_id=#{dpProjectId}</if>
+			<if test="dpDailyId != null"> and dp_daily_id=#{dpDailyId}</if>
+			<if test="dpPlanContent != null"> and dp_plan_content=#{dpPlanContent}</if>
+			<if test="dpPlanTime != null"> and dp_plan_time=#{dpPlanTime}</if>
+			<if test="dpPlanRemarks != null"> and dp_plan_remarks=#{dpPlanRemarks}</if>
+			<if test="dpCreateBy != null"> and dp_create_by=#{dpCreateBy}</if>
+			<if test="dpCreateDate != null"> and dp_create_date=#{dpCreateDate}</if>
+			<if test="dpUpdateBy != null"> and dp_update_by=#{dpUpdateBy}</if>
+			<if test="dpUpdateDate != null"> and dp_update_date=#{dpUpdateDate}</if>
+			<if test="dpDel != null"> and dp_del=#{dpDel}</if>
+		</where>
+	</select>
+
+	<!-- 查询全部 -->
+	<select id="queryAll" resultMap="resultMap">
+		select * from daily_plan where daily_plan_del=0 order by dp_id desc
+	</select>
+
+	<update id="deleteplanBydailyid">
+		update daily_plan set dp_del=1 where dp_daily_id=#{dailyid}
+	</update>
+
+</mapper>

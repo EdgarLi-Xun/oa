@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.daily.IDailySenderDao">
+
+  <resultMap id="resultMap" type="com.sega.application.oa.entity.daily.DailySenderEntity">
+    <id column="ds_id" property="dsId"/><!-- 用户自定义接收人 -->
+    <result column="ds_id" property="dsId"/><!-- 用户自定义接收人 -->
+    <result column="ds_user_id" property="dsUserId"/><!-- 发送人ID -->
+    <result column="ds_user_name" property="dsUserName"/>
+    <result column="ds_recevicer" property="dsRecevicer"/><!-- 默认接收人ID -->
+    <result column="ds_type" property="dsType"/><!-- 接收类型：0:发送，1：抄送 -->
+    <result column="ds_create_by" property="dsCreateBy"/><!-- 创建人 -->
+    <result column="ds_create_date" property="dsCreateDate"/><!-- 创建时间 -->
+    <result column="ds_update_by" property="dsUpdateBy"/><!-- 创建时间 -->
+    <result column="ds_udpate_date" property="dsUdpateDate"/><!-- 更新时间 -->
+    <result column="ds_del" property="dsDel"/><!-- 是否删除：0：未删除，1：已删除 -->
+    <result column="ds_send_email" property="dsSendEmail"/><!-- 是否删除：0：未删除，1：已删除 -->
+
+
+  </resultMap>
+
+  <!--查询字段-->
+  <sql id="dailySenderColumns">
+    ds_id,
+		ds_user_id,
+		ds_recevicer,
+		ds_type,
+		ds_create_by,
+		ds_create_date,
+		ds_update_by,
+		ds_udpate_date,
+		ds_del,
+		ds_user_name
+  </sql>
+
+  <!--查询条件-->
+  <sql id="commonCondition">
+    <if test="dsId != null and dsId != ''">and ds_id=#{dsId}</if>
+    <if test="dsUserId != null">and ds_user_id=#{dsUserId}</if>
+    <if test="dsRecevicer != null">and ds_recevicer=#{dsRecevicer}</if>
+    <if test="dsType != null">and ds_type=#{dsType}</if>
+    <if test="dsCreateBy != null">and ds_create_by=#{dsCreateBy}</if>
+    <if test="dsCreateDate != null">and ds_create_date=#{dsCreateDate}</if>
+    <if test="dsUpdateBy != null">and ds_update_by=#{dsUpdateBy}</if>
+    <if test="dsUdpateDate != null">and ds_udpate_date=#{dsUdpateDate}</if>
+    <if test="dsDel != null">and ds_del=#{dsDel}</if>
+    <if test="dsSendEmail != null">and ds_send_email=#{dsSendEmail}</if>
+
+  </sql>
+
+  <!-- 条件查询 -->
+  <select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailySenderEntity">
+    select <include refid="dailySenderColumns"></include> from daily_sender
+    <where>
+      <include refid="commonCondition"></include>
+      and ifnull(ds_del,0)=0
+    </where>
+    order by ds_id desc
+  </select>
+
+  <select id="querysendByPage" resultType="com.sega.application.oa.entity.daily.DailySenderEntity">
+    SELECT ds.ds_user_id dsUserId,if(ds.ds_type=1,'抄送','发送') DsTypefy,ds.ds_recevicer dsRecevicer,ds.ds_id
+    dsId,ds.ds_user_name dsUserName,user2.user_name userName,ds.ds_type dsType,ds_send_email dsSendEmail from
+    daily_sender ds left join user user1 on ds.ds_user_id=user1.user_id left join user user2 on
+    ds.ds_recevicer=user2.user_id
+    <where>
+      <include refid="commonCondition"></include>
+      and ifnull(ds_del,0)=0
+    </where>
+    order by ds_id desc
+
+  </select>
+
+  <select id="queryjsrEmail" resultType="map">
+    select aa.*
+    from (
+           SELECT user_name userName, user_email email
+           from user
+           where user_del = 0
+           union
+           select ds_user_name userName, ds_send_email email
+           from daily_sender
+           where ds_del = 0
+         ) aa
+    where aa.email is not null
+    order by aa.email
+
+  </select>
+
+
+  <select id="querycsrEmail" resultType="map">
+    select aa.*
+    from (
+           SELECT user_name userName, user_email email
+           from user
+           where user_del = 0
+
+           union
+
+           select ds_user_name userName, ds_send_email email
+           from daily_sender
+           where ds_del = 0
+         ) aa
+
+    order by aa.email
+  </select>
+
+  <select id="queryJsrAndCsrEmail" resultType="map">
+
+    SELECT daily_sjr_name dayilsjrName, daily_csr_name dayilcsrName
+    FROM `daily`
+    where daily_del = 0
+    order by daily_date desc
+    limit 1
+
+  </select>
+
+  <!-- 保存 -->
+  <insert id="saveEntity" useGeneratedKeys="true" keyProperty="dsId"
+          parameterType="com.sega.application.oa.entity.daily.DailySenderEntity">
+    insert into daily_sender
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="dsUserId != null">ds_user_id,</if>
+      <if test="dsUserName != null">ds_user_name,</if>
+      <if test="dsRecevicer != null">ds_recevicer,</if>
+      <if test="dsType != null">ds_type,</if>
+      <if test="dsCreateBy != null">ds_create_by,</if>
+      <if test="dsCreateDate != null">ds_create_date,</if>
+      <if test="dsUpdateBy != null">ds_update_by,</if>
+      <if test="dsUdpateDate != null">ds_udpate_date,</if>
+      <if test="dsDel != null">ds_del,</if>
+      <if test="dsSendEmail != null">ds_send_email,</if>
+
+
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="dsUserId != null">#{dsUserId},</if>
+      <if test="dsUserName != null">#{dsUserName},</if>
+      <if test="dsRecevicer != null">#{dsRecevicer},</if>
+      <if test="dsType != null">#{dsType},</if>
+      <if test="dsCreateBy != null">#{dsCreateBy},</if>
+      <if test="dsCreateDate != null">#{dsCreateDate},</if>
+      <if test="dsUpdateBy != null">#{dsUpdateBy},</if>
+      <if test="dsUdpateDate != null">#{dsUdpateDate},</if>
+      <if test="dsDel != null">#{dsDel},</if>
+      <if test="dsSendEmail != null">#{dsSendEmail},</if>
+
+    </trim>
+  </insert>
+
+  <!-- 批量保存 -->
+  <insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="dsId">
+    insert into daily_sender
+    (ds_user_id,ds_user_name,ds_recevicer,ds_type,ds_create_by,ds_create_date,ds_update_by,ds_udpate_date,ds_del,)
+    values
+    <foreach collection="list" item="item" index="index" separator=",">
+      (#{item.dsUserId},#{item.dsUserName},#{item.dsRecevicer},#{item.dsType},#{item.dsCreateBy},#{item.dsCreateDate},#{item.dsUpdateBy},#{item.dsUdpateDate},#{item.dsDel},)
+    </foreach>
+  </insert>
+
+  <!-- 更新 -->
+  <update id="updateEntity" parameterType="com.sega.application.oa.entity.daily.DailySenderEntity">
+    update daily_sender
+    <set>
+      <if test="dsUserId != null">ds_user_id=#{dsUserId},</if>
+      <if test="dsUserName != null">ds_user_name=#{dsUserName},</if>
+      <if test="dsRecevicer != null">ds_recevicer=#{dsRecevicer},</if>
+      <if test="dsType != null">ds_type=#{dsType},</if>
+      <if test="dsCreateBy != null">ds_create_by=#{dsCreateBy},</if>
+      <if test="dsCreateDate != null">ds_create_date=#{dsCreateDate},</if>
+      <if test="dsUpdateBy != null">ds_update_by=#{dsUpdateBy},</if>
+      <if test="dsUdpateDate != null">ds_udpate_date=#{dsUdpateDate},</if>
+      <if test="dsDel != null">ds_del=#{dsDel},</if>
+      <if test="dsSendEmail != null">ds_send_email=#{dsSendEmail},</if>
+    </set>
+    <where>
+      <if test="dsId != null">and ds_id=#{dsId}</if>
+      <if test="idArray != null">
+        ds_id in
+        <foreach collection="idArray" item="item" index="index"
+                 open="(" separator="," close=")">#{item}
+        </foreach>
+      </if>
+    </where>
+  </update>
+
+  <!-- 根据id获取 -->
+  <select id="getById" resultMap="resultMap" parameterType="int">
+    select *
+    from daily_sender
+    where ds_id = #{dsId}
+      and daily_sender_del = 0
+  </select>
+
+  <!-- 根据实体获取 -->
+  <select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailySenderEntity">
+    select * from daily_sender
+    <where>
+      <if test="dsId != null">and ds_id=#{dsId}</if>
+      <if test="dsUserId != null">and ds_user_id=#{dsUserId}</if>
+      <if test="dsRecevicer != null">and ds_recevicer=#{dsRecevicer}</if>
+      <if test="dsType != null">and ds_type=#{dsType}</if>
+      <if test="dsCreateBy != null">and ds_create_by=#{dsCreateBy}</if>
+      <if test="dsCreateDate != null">and ds_create_date=#{dsCreateDate}</if>
+      <if test="dsUpdateBy != null">and ds_update_by=#{dsUpdateBy}</if>
+      <if test="dsUdpateDate != null">and ds_udpate_date=#{dsUdpateDate}</if>
+      <if test="dsDel != null">and ds_del=#{dsDel}</if>
+      <if test="dsSendEmail != null">and ds_send_email=#{dsSendEmail}</if>
+
+
+      and daily_sender_del=0
+    </where>
+    limit 0,1
+  </select>
+
+  <!-- 删除 -->
+  <delete id="deleteById" parameterType="int">
+    update daily_sender
+    set daily_sender_del=1
+    where ds_id = #{dsId}
+  </delete>
+
+  <!-- 批量删除 -->
+  <delete id="deleteByIds">
+    update daily_sender set daily_sender_del=1
+    <where>
+      ds_id in
+      <foreach collection="ids" item="item" index="index"
+               open="(" separator="," close=")">#{item}
+      </foreach>
+    </where>
+  </delete>
+
+  <!-- 根据实体删除 -->
+  <select id="deleteEntity" parameterType="com.sega.application.oa.entity.daily.DailySenderEntity">
+    update daily_sender set daily_sender_del=1
+    <where>
+      <if test="dsId != null">and ds_id=#{dsId}</if>
+      <if test="dsUserId != null">and ds_user_id=#{dsUserId}</if>
+      <if test="dsRecevicer != null">and ds_recevicer=#{dsRecevicer}</if>
+      <if test="dsType != null">and ds_type=#{dsType}</if>
+      <if test="dsCreateBy != null">and ds_create_by=#{dsCreateBy}</if>
+      <if test="dsCreateDate != null">and ds_create_date=#{dsCreateDate}</if>
+      <if test="dsUpdateBy != null">and ds_update_by=#{dsUpdateBy}</if>
+      <if test="dsUdpateDate != null">and ds_udpate_date=#{dsUdpateDate}</if>
+      <if test="dsDel != null">and ds_del=#{dsDel}</if>
+    </where>
+  </select>
+
+  <!-- 查询全部 -->
+  <select id="queryAll" resultMap="resultMap">
+    select *
+    from daily_sender
+    where daily_sender_del = 0
+    order by ds_id desc
+  </select>
+
+</mapper>

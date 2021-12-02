@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.IRoleDataDao">
+	
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.system.RoleDataEntity">
+		<id column="rd_id" property="rdId" /><!--数据权限主键 -->
+		<result column="rd_id" property="rdId" /><!--数据权限主键 -->
+		<result column="rd_content" property="rdContent" /><!--数据ID -->
+		<result column="rd_value" property="rdValue" /><!--数据ID -->
+		<result column="rd_user_id" property="rdUserId" /><!--用户ID -->
+		<result column="rd_table" property="rdTable" /><!--表名 -->
+		<result column="create_by" property="createBy" /><!--创建人 -->
+		<result column="create_date" property="createDate" /><!--更新时间 -->
+		<result column="update_by" property="updateBy" /><!--更新人 -->
+		<result column="update_date" property="updateDate" /><!--更新时间 -->
+		<result column="rd_column" property="rdColumn" /><!--表对应列名 -->
+		<result column="rd_model" property="rdModel" /><!--对应模块编码 -->
+		<result column="rd_del" property="rdDel" /><!--未删除：0:未删除，1：已删除 -->
+	</resultMap>
+	
+	<!--保存-->	
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="rdId"
+		parameterType="com.sega.application.oa.entity.system.RoleDataEntity" >
+		insert into role_data
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="rdContent != null">rd_content,</if>
+			<if test="rdValue != null">rd_value,</if>			
+			<if test="rdUserId != null">rd_user_id,</if>
+			<if test="rdTable != null">rd_table,</if>
+			<if test="createBy != null">create_by,</if>
+			<if test="createDate != null">create_date,</if>
+			<if test="updateBy != null">update_by,</if>
+			<if test="updateDate != null">update_date,</if>
+			<if test="rdColumn != null">rd_column,</if>
+			<if test="rdModel != null">rd_model,</if>
+			<if test="rdDel != null">rd_del,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="rdContent != null">#{rdContent},</if>
+			<if test="rdValue != null">#{rdValue},</if>
+			<if test="rdUserId != null">#{rdUserId},</if>
+			<if test="rdTable != null">#{rdTable},</if>
+			<if test="createBy != null">#{createBy},</if>
+			<if test="createDate != null">#{createDate},</if>
+			<if test="updateBy != null">#{updateBy},</if>
+			<if test="updateDate != null">#{updateDate},</if>
+			<if test="rdColumn != null">#{rdColumn},</if>
+			<if test="rdModel != null">#{rdModel},</if>
+			<if test="rdDel != null">#{rdDel},</if>
+		</trim>
+	</insert>
+	
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List">
+		insert into role_data (rd_content, rd_value, rd_user_id, rd_table, create_by, create_date, rd_model) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.rdContent},#{item.rdValue},#{item.rdUserId},#{item.rdTable},#{item.createBy},#{item.createDate},#{item.rdModel})
+		</foreach>
+	</insert>
+	
+	<!--更新-->	
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.system.RoleDataEntity">
+		update role_data
+		<set>
+			<if test="rdContent != null">rd_content=#{rdContent},</if>
+			<if test="rdValue != null">rd_value=#{rdValue},</if>
+			<if test="rdUserId != null">rd_user_id=#{rdUserId},</if>
+			<if test="rdTable != null">rd_table=#{rdTable},</if>
+			<if test="createBy != null">create_by=#{createBy},</if>
+			<if test="createDate != null">create_date=#{createDate},</if>
+			<if test="updateBy != null">update_by=#{updateBy},</if>
+			<if test="updateDate != null">update_date=#{updateDate},</if>
+			<if test="rdColumn != null">rd_column=#{rdColumn},</if>
+			<if test="rdModel != null">rd_model=#{rdModel},</if>
+			<if test="rdDel != null">rd_del=#{rdDel},</if>
+		</set>
+		where rd_id = #{rdId} and rd_del=0
+	</update>
+	
+	<!-- 撤回 -->	
+	<update id="withdraw" parameterType="com.sega.application.oa.entity.system.RoleDataEntity">
+		update role_data set rd_del = 0
+		<where>
+			<if test="rdValue != null and rdValue != ''">and rd_value=#{rdValue}</if>
+			<if test="rdTable != null and rdTable != ''">and rd_table=#{rdTable}</if>
+			<if test="rdModel != null and rdModel != ''">and rd_model=#{rdModel}</if>
+		</where>
+	</update>
+	
+	<!--根据id获取-->	
+	<select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+		select * from role_data where rd_id=#{rdId} and rd_del=0
+	</select>
+	
+	<!--根据实体获取-->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.RoleDataEntity">
+		select  * from role_data
+		<where>
+			<if test="rdId != null"> and rd_id=#{rdId}</if>
+			<if test="rdContent != null"> and rd_content=#{rdContent}</if>
+			<if test="rdValue != null"> and rd_value=#{rdValue}</if>
+			<if test="rdUserId != null"> and rd_user_id=#{rdUserId}</if>
+			<if test="rdTable != null"> and rd_table=#{rdTable}</if>
+			<if test="createBy != null"> and create_by=#{createBy}</if>
+			<if test="createDate != null"> and create_date=#{createDate}</if>
+			<if test="updateBy != null"> and update_by=#{updateBy}</if>
+			<if test="updateDate != null"> and update_date=#{updateDate}</if>
+			<if test="rdColumn != null"> and rd_column=#{rdColumn}</if>
+			<if test="rdModel != null"> and rd_model=#{rdModel}</if>
+			<if test="rdDel != null"> and rd_del=#{rdDel}</if>
+			and rd_del=0		
+		</where>
+		order by rd_id
+	</select>	
+	
+	<!--删除-->	
+	<delete id="deleteById" parameterType="java.lang.Long">
+		update role_data set rd_del=1 where rd_id=#{rdId}
+	</delete>	
+	
+	<!--批量删除-->	
+	<delete id="deleteByIds" >
+		update role_data set rd_del=1
+		<where>
+			 rd_id in <foreach collection="ids" item="item" index="index" 
+			open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+	
+	<!--根据实体删除-->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.RoleDataEntity">
+		update role_data
+		<set>
+			<if test="updateBy != null">update_by=#{updateBy},</if>
+			<if test="updateDate != null">update_date=#{updateDate},</if>
+			rd_del=1
+		</set>
+		<where>
+			<if test="rdId != null"> and rd_id=#{rdId}</if>
+			<if test="rdContent != null"> and rd_content=#{rdContent}</if>
+			<if test="rdValue != null"> and rd_value=#{rdValue}</if>
+			<if test="rdUserId != null"> and rd_user_id=#{rdUserId}</if>
+			<if test="rdTable != null"> and rd_table=#{rdTable}</if>
+			<if test="createBy != null"> and create_by=#{createBy}</if>
+			<if test="createDate != null"> and create_date=#{createDate}</if>
+			<if test="rdColumn != null"> and rd_column=#{rdColumn}</if>
+			<if test="rdModel != null"> and rd_model=#{rdModel}</if>
+			<if test="querySql != null"> ${querySql}</if>
+			and rd_del=0
+		</where>
+	</select>
+	
+	<!--查询全部-->	
+	<select id="queryAll" resultMap="resultMap">
+		select * from role_data where rd_del=0 order by rd_id desc
+	</select>
+	
+	<!--条件查询-->	
+	<select id="query" resultMap="resultMap">
+		select * from role_data 
+		<where>
+			<if test="rdId != null"> and rd_id=#{rdId}</if>
+			<if test="rdContent != null"> and rd_content=#{rdContent}</if>
+			<if test="rdValue != null"> and rd_value=#{rdValue}</if>
+			<if test="rdUserId != null"> and rd_user_id=#{rdUserId}</if>
+			<if test="rdTable != null"> and rd_table=#{rdTable}</if>
+			<if test="createBy != null"> and create_by=#{createBy}</if>
+			<if test="createDate != null"> and create_date=#{createDate}</if>
+			<if test="updateBy != null"> and update_by=#{updateBy}</if>
+			<if test="updateDate != null"> and update_date=#{updateDate}</if>
+			<if test="rdColumn != null"> and rd_column=#{rdColumn}</if>
+			<if test="rdModel != null"> and rd_model=#{rdModel}</if>
+			<if test="rdDel != null"> and rd_del=#{rdDel}</if>
+			and rd_del=0
+		</where>
+		order by rd_id desc
+	</select>
+	
+</mapper>

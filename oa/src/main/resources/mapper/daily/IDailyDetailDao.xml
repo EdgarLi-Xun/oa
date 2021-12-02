@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.daily.IDailyDetailDao">
+
+	<resultMap id="resultMap" type="com.sega.application.oa.entity.daily.DailyDetailEntity">
+		<id column="dd_id" property="ddId" /><!--  -->
+		<result column="dd_id" property="ddId" /><!--  -->
+		<result column="dd_daily_id" property="ddDailyId" /><!-- 日报id -->
+		<result column="dd_project_id" property="ddProjectId" /><!-- 项目id -->
+		<result column="dd_project_name" property="ddProjectName" /><!-- 项目名称 -->
+		<result column="dd_time" property="ddTime" /><!-- 耗时 -->
+		<result column="dd_content" property="ddContent" /><!-- 工作内容 -->
+		<result column="dd_schedule" property="ddSchedule" /><!-- 进度 -->
+		<result column="dd_remarks" property="ddRemarks" /><!-- 备注 -->
+		<result column="dd_create_by" property="ddCreateBy" /><!-- 创建人 -->
+		<result column="dd_create_date" property="ddCreateDate" /><!-- 创建时间 -->
+		<result column="dd_update_by" property="ddUpdateBy" /><!-- 修改人 -->
+		<result column="dd_update_date" property="ddUpdateDate" /><!-- 更新时间 -->
+		<result column="dd_del" property="ddDel" /><!-- 是否删除，0:未删除，1：已删除 -->
+	</resultMap>
+
+	<!--查询字段-->
+	<sql id="dailyDetailColumns">
+		dd_id,
+		dd_daily_id,
+		dd_project_id,
+		dd_project_name,
+		dd_time,
+		dd_content,
+		dd_schedule,
+		dd_remarks,
+		dd_create_by,
+		dd_create_date,
+		dd_update_by,
+		dd_update_date,
+		dd_del
+	</sql>
+
+	<!--查询条件-->
+	<sql id="commonCondition">
+        <if test="ddId != null and ddId != ''"> and dd_id=#{ddId}</if>
+		<if test="ddDailyId != null"> and dd_daily_id=#{ddDailyId}</if>
+		<if test="ddProjectId != null"> and dd_project_id=#{ddProjectId}</if>
+		<if test="ddProjectName != null and ddProjectName != ''"> and dd_project_name LIKE CONCAT(CONCAT('%', #{ddProjectName}), '%')</if>
+		<if test="ddTime != null"> and dd_time=#{ddTime}</if>
+		<if test="ddContent != null and ddContent != ''"> and dd_content LIKE CONCAT(CONCAT('%', #{ddContent}), '%')</if>
+		<if test="ddSchedule != null"> and dd_schedule=#{ddSchedule}</if>
+		<if test="ddRemarks != null and ddRemarks != ''"> and dd_remarks LIKE CONCAT(CONCAT('%', #{ddRemarks}), '%')</if>
+		<if test="ddCreateBy != null"> and dd_create_by=#{ddCreateBy}</if>
+		<if test="ddCreateDate != null"> and dd_create_date=#{ddCreateDate}</if>
+		<if test="ddUpdateBy != null"> and dd_update_by=#{ddUpdateBy}</if>
+		<if test="ddUpdateDate != null"> and dd_update_date=#{ddUpdateDate}</if>
+		<if test="ddDel != null"> and dd_del=#{ddDel}</if>
+    </sql>
+
+	<!-- 条件查询 -->
+	<select id="query" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyDetailEntity">
+		select <include refid="dailyDetailColumns"></include> from daily_detail
+		<where>
+			<include refid="commonCondition"></include>
+			and ifnull(dd_del,0)=0
+		</where>
+		order by dd_id desc
+	</select>
+
+	<!-- 保存 -->
+	<insert id="saveEntity" useGeneratedKeys="true" keyProperty="ddId"
+		parameterType="com.sega.application.oa.entity.daily.DailyDetailEntity" >
+		insert into daily_detail
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+			<if test="ddDailyId != null">dd_daily_id,</if>
+			<if test="ddProjectId != null">dd_project_id,</if>
+			<if test="ddProjectName != null">dd_project_name,</if>
+			<if test="ddTime != null">dd_time,</if>
+			<if test="ddContent != null">dd_content,</if>
+			<if test="ddSchedule != null">dd_schedule,</if>
+			<if test="ddRemarks != null">dd_remarks,</if>
+			<if test="ddCreateBy != null">dd_create_by,</if>
+			<if test="ddCreateDate != null">dd_create_date,</if>
+			<if test="ddUpdateBy != null">dd_update_by,</if>
+			<if test="ddUpdateDate != null">dd_update_date,</if>
+			<if test="ddDel != null">dd_del,</if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+			<if test="ddDailyId != null">#{ddDailyId},</if>
+			<if test="ddProjectId != null">#{ddProjectId},</if>
+			<if test="ddProjectName != null">#{ddProjectName},</if>
+			<if test="ddTime != null">#{ddTime},</if>
+			<if test="ddContent != null">#{ddContent},</if>
+			<if test="ddSchedule != null">#{ddSchedule},</if>
+			<if test="ddRemarks != null">#{ddRemarks},</if>
+			<if test="ddCreateBy != null">#{ddCreateBy},</if>
+			<if test="ddCreateDate != null">#{ddCreateDate},</if>
+			<if test="ddUpdateBy != null">#{ddUpdateBy},</if>
+			<if test="ddUpdateDate != null">#{ddUpdateDate},</if>
+			<if test="ddDel != null">#{ddDel},</if>
+		</trim>
+	</insert>
+
+	<!-- 批量保存 -->
+	<insert id="saveBatch" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="ddId">
+		insert into daily_detail (dd_daily_id,dd_project_id,dd_project_name,dd_time,dd_content,dd_schedule,dd_remarks,dd_create_by,dd_create_date,dd_update_by,dd_update_date,dd_del,) values
+		<foreach collection="list" item="item" index="index" separator=",">
+			(#{item.ddDailyId},#{item.ddProjectId},#{item.ddProjectName},#{item.ddTime},#{item.ddContent},#{item.ddSchedule},#{item.ddRemarks},#{item.ddCreateBy},#{item.ddCreateDate},#{item.ddUpdateBy},#{item.ddUpdateDate},#{item.ddDel},)
+		</foreach>
+	</insert>
+
+	<!-- 更新 -->
+	<update id="updateEntity" parameterType="com.sega.application.oa.entity.daily.DailyDetailEntity">
+		update daily_detail
+		<set>
+			<if test="ddDailyId != null">dd_daily_id=#{ddDailyId},</if>
+			<if test="ddProjectId != null">dd_project_id=#{ddProjectId},</if>
+			<if test="ddProjectName != null">dd_project_name=#{ddProjectName},</if>
+			<if test="ddTime != null">dd_time=#{ddTime},</if>
+			<if test="ddContent != null">dd_content=#{ddContent},</if>
+			<if test="ddSchedule != null">dd_schedule=#{ddSchedule},</if>
+			<if test="ddRemarks != null">dd_remarks=#{ddRemarks},</if>
+			<if test="ddCreateBy != null">dd_create_by=#{ddCreateBy},</if>
+			<if test="ddCreateDate != null">dd_create_date=#{ddCreateDate},</if>
+			<if test="ddUpdateBy != null">dd_update_by=#{ddUpdateBy},</if>
+			<if test="ddUpdateDate != null">dd_update_date=#{ddUpdateDate},</if>
+			<if test="ddDel != null">dd_del=#{ddDel},</if>
+		</set>
+		<where>
+			<if test="ddId != null"> and dd_id=#{ddId}</if>
+			<if test="idArray != null">
+				dd_id in <foreach collection="idArray" item="item" index="index"
+										open="(" separator="," close=")">#{item}</foreach>
+			</if>
+		</where>
+	</update>
+
+	<!-- 根据id获取 -->
+	<select id="getById" resultMap="resultMap" parameterType="int">
+		select * from daily_detail where dd_id=#{ddId} and daily_detail_del=0
+	</select>
+
+	<!-- 根据实体获取 -->
+	<select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.daily.DailyDetailEntity">
+		select * from daily_detail
+		<where>
+			<if test="ddId != null"> and dd_id=#{ddId}</if>
+			<if test="ddDailyId != null"> and dd_daily_id=#{ddDailyId}</if>
+			<if test="ddProjectId != null"> and dd_project_id=#{ddProjectId}</if>
+			<if test="ddProjectName != null"> and dd_project_name=#{ddProjectName}</if>
+			<if test="ddTime != null"> and dd_time=#{ddTime}</if>
+			<if test="ddContent != null"> and dd_content=#{ddContent}</if>
+			<if test="ddSchedule != null"> and dd_schedule=#{ddSchedule}</if>
+			<if test="ddRemarks != null"> and dd_remarks=#{ddRemarks}</if>
+			<if test="ddCreateBy != null"> and dd_create_by=#{ddCreateBy}</if>
+			<if test="ddCreateDate != null"> and dd_create_date=#{ddCreateDate}</if>
+			<if test="ddUpdateBy != null"> and dd_update_by=#{ddUpdateBy}</if>
+			<if test="ddUpdateDate != null"> and dd_update_date=#{ddUpdateDate}</if>
+			<if test="ddDel != null"> and dd_del=#{ddDel}</if>
+			and daily_detail_del=0
+		</where>
+		limit 0,1
+	</select>
+
+	<!-- 删除 -->
+	<delete id="deleteById" parameterType="int">
+		update daily_detail set daily_detail_del=1 where dd_id=#{ddId}
+	</delete>
+
+	<!-- 批量删除 -->
+	<delete id="deleteByIds" >
+		update daily_detail set daily_detail_del=1
+		<where>
+			dd_id in <foreach collection="ids" item="item" index="index"
+									open="(" separator="," close=")">#{item}</foreach>
+		</where>
+	</delete>
+
+	<!-- 根据实体删除 -->
+	<select id="deleteEntity" parameterType="com.sega.application.oa.entity.daily.DailyDetailEntity">
+		update daily_detail set daily_detail_del=1
+		<where>
+			<if test="ddId != null"> and dd_id=#{ddId}</if>
+			<if test="ddDailyId != null"> and dd_daily_id=#{ddDailyId}</if>
+			<if test="ddProjectId != null"> and dd_project_id=#{ddProjectId}</if>
+			<if test="ddProjectName != null"> and dd_project_name=#{ddProjectName}</if>
+			<if test="ddTime != null"> and dd_time=#{ddTime}</if>
+			<if test="ddContent != null"> and dd_content=#{ddContent}</if>
+			<if test="ddSchedule != null"> and dd_schedule=#{ddSchedule}</if>
+			<if test="ddRemarks != null"> and dd_remarks=#{ddRemarks}</if>
+			<if test="ddCreateBy != null"> and dd_create_by=#{ddCreateBy}</if>
+			<if test="ddCreateDate != null"> and dd_create_date=#{ddCreateDate}</if>
+			<if test="ddUpdateBy != null"> and dd_update_by=#{ddUpdateBy}</if>
+			<if test="ddUpdateDate != null"> and dd_update_date=#{ddUpdateDate}</if>
+			<if test="ddDel != null"> and dd_del=#{ddDel}</if>
+		</where>
+	</select>
+
+	<!-- 查询全部 -->
+	<select id="queryAll" resultMap="resultMap">
+		select * from daily_detail where daily_detail_del=0 order by dd_id desc
+	</select>
+
+	<update id="deletedetailBydailyid">
+		UPDATE daily_detail set dd_del=1 where dd_daily_id=#{dailyid}
+	</update>
+
+</mapper>

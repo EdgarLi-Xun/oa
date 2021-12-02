@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sega.application.oa.dao.system.IRoleDao">
+
+  <resultMap id="resultMap" type="com.sega.application.oa.entity.system.RoleEntity">
+    <id column="role_id" property="roleId"/><!--角色id -->
+    <result column="role_id" property="roleId"/><!--角色id -->
+    <result column="role_name" property="roleName"/><!--角色名称 -->
+    <result column="role_data_type" property="roleDataType"/><!--角色类别：角色数据权限分类-->
+    <result column="role_type" property="roleType"/><!--角色类别：0用户，1管理员 -->
+    <result column="role_describe" property="roleDescribe"/><!--角色描述 -->
+    <result column="create_by" property="createBy"/><!--创建人 -->
+    <result column="create_date" property="createDate"/><!--创建时间 -->
+    <result column="update_by" property="updateBy"/><!--更新人 -->
+    <result column="update_date" property="updateDate"/><!--更新时间 -->
+    <result column="role_del" property="roleDel"/><!--是否已删除: 0：未删除，1：已删除 -->
+  </resultMap>
+
+  <!--保存-->
+  <insert id="saveEntity" useGeneratedKeys="true" keyProperty="roleId"
+          parameterType="com.sega.application.oa.entity.system.RoleEntity">
+    insert into role
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="roleName != null">role_name,</if>
+      <if test="roleDataType != null">role_data_type,</if>
+      <if test="roleType != null">role_type,</if>
+      <if test="roleDescribe != null">role_describe,</if>
+      <if test="createBy != null">create_by,</if>
+      <if test="createDate != null">create_date,</if>
+      <if test="updateBy != null">update_by,</if>
+      <if test="updateDate != null">update_date,</if>
+      <if test="roleDel != null">role_del,</if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="roleName != null">#{roleName},</if>
+      <if test="roleDataType != null">#{roleDataType},</if>
+      <if test="roleType != null">#{roleType},</if>
+      <if test="roleDescribe != null">#{roleDescribe},</if>
+      <if test="createBy != null">#{createBy},</if>
+      <if test="createDate != null">#{createDate},</if>
+      <if test="updateBy != null">#{updateBy},</if>
+      <if test="updateDate != null">#{updateDate},</if>
+      <if test="roleDel != null">#{roleDel},</if>
+    </trim>
+  </insert>
+
+  <!--更新-->
+  <update id="updateEntity" parameterType="com.sega.application.oa.entity.system.RoleEntity">
+    update role
+    <set>
+      <if test="roleName != null">role_name=#{roleName},</if>
+      <if test="roleDataType != null">role_data_type=#{roleDataType},</if>
+      <if test="roleType != null">role_type=#{roleType},</if>
+      <if test="roleDescribe != null">role_describe=#{roleDescribe},</if>
+      <if test="createBy != null">create_by=#{createBy},</if>
+      <if test="createDate != null">create_date=#{createDate},</if>
+      <if test="updateBy != null">update_by=#{updateBy},</if>
+      <if test="updateDate != null">update_date=#{updateDate},</if>
+      <if test="roleDel != null">role_del=#{roleDel},</if>
+    </set>
+    where role_id = #{roleId} and role_del=0
+  </update>
+
+  <!--根据id获取-->
+  <select id="getById" resultMap="resultMap" parameterType="java.lang.Long">
+    select *
+    from role
+    where role_id = #{roleId}
+      and role_del = 0
+  </select>
+
+  <!--根据实体获取-->
+  <select id="getEntity" resultMap="resultMap" parameterType="com.sega.application.oa.entity.system.RoleEntity">
+    select * from role
+    <where>
+      <if test="roleId != null">and role_id=#{roleId}</if>
+      <if test="roleDataType != null">and role_data_type=#{roleDataType}</if>
+      <if test="roleName != null">and role_name=#{roleName}</if>
+      <if test="roleType != null">and role_type=#{roleType}</if>
+      <if test="roleDescribe != null">and role_describe=#{roleDescribe}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="roleDel != null">and role_del=#{roleDel}</if>
+      and role_del=0
+    </where>
+    order by role_id limit 0,1
+  </select>
+
+  <!--删除-->
+  <delete id="deleteById" parameterType="java.lang.Long">
+    update role
+    set role_del=1
+    where role_id = #{roleId}
+  </delete>
+
+  <!--批量删除-->
+  <delete id="deleteByIds">
+    update role set role_del=1
+    <where>
+      role_id in
+      <foreach collection="ids" item="item" index="index"
+               open="(" separator="," close=")">#{item}
+      </foreach>
+    </where>
+  </delete>
+
+  <!--根据实体删除-->
+  <select id="deleteEntity" parameterType="com.sega.application.oa.entity.system.RoleEntity">
+    update role set role_del=1
+    <where>
+      <if test="roleId != null">and role_id=#{roleId}</if>
+      <if test="roleDataType != null">and role_data_type=#{roleDataType}</if>
+      <if test="roleName != null">and role_name=#{roleName}</if>
+      <if test="roleType != null">and role_type=#{roleType}</if>
+      <if test="roleDescribe != null">and role_describe=#{roleDescribe}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="roleDel != null">and role_del=#{roleDel}</if>
+    </where>
+  </select>
+
+  <!--查询全部-->
+  <select id="queryAll" resultMap="resultMap">
+    select *
+    from role
+    where role_del = 0
+    order by role_id desc
+  </select>
+
+  <!--条件查询-->
+  <select id="query" resultMap="resultMap">
+    select * from role
+    <where>
+      <if test="roleId != null">and role_id=#{roleId}</if>
+      <if test="roleDataType != null">and role_data_type=#{roleDataType}</if>
+      <if test="roleName != null">and role_name=#{roleName}</if>
+      <if test="roleType != null">and role_type=#{roleType}</if>
+      <if test="roleDescribe != null">and role_describe=#{roleDescribe}</if>
+      <if test="createBy != null">and create_by=#{createBy}</if>
+      <if test="createDate != null">and create_date=#{createDate}</if>
+      <if test="updateBy != null">and update_by=#{updateBy}</if>
+      <if test="updateDate != null">and update_date=#{updateDate}</if>
+      <if test="roleDel != null">and role_del=#{roleDel}</if>
+      and role_del=0
+    </where>
+    order by role_id desc
+  </select>
+  <select id="checkByRoleName" resultType="java.lang.Integer">
+    select count(role_id)
+    from role
+    where role_name = #{roleName}
+    and role_del = 0
+    <if test="roleId!=null and roleId!=''">
+      and role_id!=#{roleId}
+    </if>
+  </select>
+
+</mapper>
